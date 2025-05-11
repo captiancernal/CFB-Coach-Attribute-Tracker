@@ -1,2339 +1,782 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Swamp Social - Florida Gators Football</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-/* Background and Fonts */
-body {
-  font-family: 'Roboto', sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f4f9; /* Base white */
-  color: #0021a5; /* Gators blue */
-  background-image: url('https://i.postimg.cc/tRVjQbYf/florida-gators-logotyp-us.png'); /* Subtle texture */
-  background-size: cover;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CFB 25 Coach Points Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
+            color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+        .container {
+            background-color: #2d3748;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 2rem;
+            border: 2px solid #4b5563;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: #90cdf4;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background-color: #374151;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 2px solid #63b3ed;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        .stat-card h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #a0aec0;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-card p {
+            font-family: 'Oswald', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .level-progress-container {
+            background-color: #1f2937;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            height: 2.25rem;
+            margin-bottom: 2rem;
+            border: 1px solid #4b5563;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .level-progress-bar {
+            background: linear-gradient(to right, #4299e1, #2b6cb0);
+            height: 100%;
+            width: 0%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: white;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+            transition: width 0.5s ease-in-out;
+        }
+        .controls-section h3, .perks-section h3 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1.25rem;
+            color: #e2e8f0;
+            border-left: 5px solid #63b3ed;
+            border-bottom: none;
+            background-color: #374151;
+            padding: 0.6rem 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 0.25rem 0.25rem 0 0;
+        }
+        .perks-section h4 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #90cdf4;
+            letter-spacing: 0.3px;
+        }
+        .perk-cost-display {
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: #a0aec0;
+        }
 
-header {
-  background: linear-gradient(90deg, #0021a5 50%, #fa4616 50%);
-  color: white;
-  text-align: center;
-  padding: 20px;
-  font-family: 'Bebas Neue', sans-serif;
-  border-bottom: 5px solid #ffcc00; /* Yellow-Gold accent */
-}
+        /* Button Group Layouts */
+        .controls-section .button-group { /* Level controls remain flex */
+             display: flex;
+             flex-wrap: wrap;
+             gap: 0.75rem;
+             justify-content: center; /* Center level buttons */
+        }
+        .perks-section .button-group { /* Perk buttons use grid */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); /* Responsive grid */
+            gap: 0.75rem;
+        }
 
-header h1 {
-  font-size: 3.5em;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  text-shadow: 2px 2px #000; /* Subtle shadow for retro vibe */
-}
+        .btn {
+            padding: 0.6rem 0.8rem; /* Adjusted padding slightly */
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid transparent;
+            /* min-width removed, grid handles width */
+            text-align: center;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.15);
+            /* Ensure buttons fill grid cell height if text wraps */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 50px; /* Give buttons a minimum height */
+        }
+        .btn:hover:not(:disabled):not(.purchased) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .btn:active:not(:disabled):not(.purchased) {
+            transform: translateY(0px);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        }
 
-header p {
-  font-size: 1.5em;
-  font-style: italic;
-}
+        /* Level Management Buttons */
+        .btn-level, .btn-level-down, .btn-reset, .btn-max-level {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.75rem 1.5rem;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.25), inset 0 -2px 0px rgba(0,0,0,0.15);
+            min-height: auto; /* Override min-height for these */
+            flex-grow: 1; /* Allow them to grow in flex container */
+        }
+        .btn-level { background-color: #38a169; color: white; border-color: #2f855a;}
+        .btn-level:hover:not(:disabled) { background-color: #2f855a; box-shadow: 0 2px 3px rgba(0,0,0,0.2), inset 0 -1px 0px rgba(0,0,0,0.1);}
+        .btn-level-down { background-color: #e53e3e; color: white; border-color: #c53030;}
+        .btn-level-down:hover:not(:disabled) { background-color: #c53030; box-shadow: 0 2px 3px rgba(0,0,0,0.2), inset 0 -1px 0px rgba(0,0,0,0.1);}
+        .btn-reset { background-color: #f59e0b; color: white; border-color: #d97706;}
+        .btn-reset:hover:not(:disabled) { background-color: #d97706; box-shadow: 0 2px 3px rgba(0,0,0,0.2), inset 0 -1px 0px rgba(0,0,0,0.1);}
+        .btn-max-level { background-color: #8b5cf6; color: white; border-color: #7c3aed;}
+        .btn-max-level:hover:not(:disabled) { background-color: #7c3aed; box-shadow: 0 2px 3px rgba(0,0,0,0.2), inset 0 -1px 0px rgba(0,0,0,0.1);}
 
-nav {
-  display: flex;
-  justify-content: center;
-  background: #0021a5; /* Gators blue */
-  border-bottom: 3px solid #fa4616;
-}
+        /* Generic Perk Button Style (Orange) */
+        .btn-perk { background-color: #dd6b20; color: white; border-color: #c05621;}
+        .btn-perk:hover:not(:disabled):not(.purchased) { background-color: #c05621; }
 
-nav a {
-  color: white;
-  padding: 15px 20px;
-  text-decoration: none;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.2em;
-  text-transform: uppercase;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
+        /* --- Skill Tree Specific Colors --- */
+        .btn-perk-ceo { background-color: #FFD700; color: #4A3B00; border-color: #DAA520;}
+        .btn-perk-ceo:hover:not(:disabled):not(.purchased) { background-color: #E6C300; }
+        .btn-perk-program-builder { background-color: #C0C0C0; color: #363636; border-color: #A8A8A8;}
+        .btn-perk-program-builder:hover:not(:disabled):not(.purchased) { background-color: #B0B0B0; }
+        .btn-perk-motivator { background-color: #FFFF00; color: #5C5C00; border-color: #DADA00;}
+        .btn-perk-motivator:hover:not(:disabled):not(.purchased) { background-color: #EAEA00; }
+        .btn-perk-architect { background-color: #800080; color: white; border-color: #6A006A;}
+        .btn-perk-architect:hover:not(:disabled):not(.purchased) { background-color: #6A006A; }
+        .btn-perk-tactician { background-color: #007bff; color: white; border-color: #0069D9;} /* Blue */
+        .btn-perk-tactician:hover:not(:disabled):not(.purchased) { background-color: #0069D9; }
+        .btn-perk-strategist { background-color: #F97316; color: white; border-color: #EA580C;}
+        .btn-perk-strategist:hover:not(:disabled):not(.purchased) { background-color: #EA580C; }
+        .btn-perk-recruiter { background-color: #DC143C; color: white; border-color: #B21030;}
+        .btn-perk-recruiter:hover:not(:disabled):not(.purchased) { background-color: #B21030; }
+        .btn-perk-talent-developer { background-color: #006400; color: white; border-color: #004D00;}
+        .btn-perk-talent-developer:hover:not(:disabled):not(.purchased) { background-color: #004D00; }
 
-nav a:hover {
-  background-color: #fa4616; /* Orange highlight */
-  transform: scale(1.1); /* Slight zoom on hover */
-}
+        /* Style for PURCHASED specific perks - Green Glow */
+        .btn.purchased {
+            background-color: #22543d !important;
+            color: #c6f6d5 !important;
+            cursor: pointer;
+            box-shadow: 0 0 8px 3px #4ade80, inset 0 0 3px rgba(200, 255, 200, 0.3);
+            border: 1px solid #34d399 !important;
+            opacity: 1;
+            transform: none;
+        }
+        .btn.purchased:hover {
+            background-color: #1e4d36 !important;
+            color: #c6f6d5 !important;
+            box-shadow: 0 0 10px 4px #4ade80, inset 0 0 4px rgba(200, 255, 200, 0.4);
+            transform: none;
+        }
 
-/* Section Design */
-.container {
-  max-width: 1000px;
-  margin: 20px auto;
-  padding: 20px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-  border: 3px solid #ffcc00; /* Yellow-Gold border */
-  background-image: url('https://i.postimg.cc/tRVjQbYf/florida-gators-logotyp-us.png'); /* Watermark */
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 1000px;
-  opacity: 0.1; /* Subtle opacity for watermark effect */
-}
+        /* General disabled style for buttons */
+        .btn:disabled:not(.purchased) {
+            background-color: #4a5568;
+            color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
+            box-shadow: none;
+            border-color: #3b4454;
+        }
 
-h2 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2.5em;
-  color: #fa4616;
-  text-align: center;
-  margin-bottom: 20px;
-  border-bottom: 5px dashed #ffcc00; /* Yard-line effect */
-  padding-bottom: 10px;
-}
+        .message-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+            border-width: 2px;
+            border-style: solid;
+        }
+        .message-box-error {
+            background-color: #fed7d7; color: #c53030; border-color: #f56565;
+        }
+        .message-box-success {
+            background-color: #c6f6d5; color: #2f855a; border-color: #68d391;
+        }
 
-/* Table Styling */
-.stats-table, .schedule-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-  font-size: 1em;
-  background: white;
-}
-
-.stats-table th, .schedule-table th {
-  background-color: #fa4616;
-  color: white;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.1em;
-  padding: 15px;
-  border: 2px solid #0021a5;
-}
-
-.stats-table td, .schedule-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
-}
-
-.schedule-table tr:nth-child(even) {
-  background-color: #f4f4f9; /* Alternating rows */
-}
-
-.schedule-table tr:hover {
-  background-color: #fa4616;
-  color: white;
-  cursor: pointer;
-}
-
-/* Buttons */
-button {
-  padding: 10px 15px;
-  background: #fa4616;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-family: 'Bebas Neue', sans-serif;
-  text-transform: uppercase;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-button:hover {
-  background: #0021a5;
-  transform: scale(1.1); /* Slight zoom */
-}
-
-/* Footer */
-footer {
-  background: linear-gradient(90deg, #0021a5 50%, #fa4616 50%);
-  color: white;
-  text-align: center;
-  padding: 10px;
-  font-family: 'Roboto', sans-serif;
-  font-size: 1em;
-  letter-spacing: 1px;
-}
-
-/* Subtle Animations and Hover Effects */
-
-/* Keyframes for fade-in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* General animation class for dynamic content */
-.animate {
-  animation: fadeIn 1s ease-in-out;
-}
-
-/* Hover effects with smooth scaling */
-button:hover, a:hover {
-  transform: scale(1.1);
-  background-color: #ffcc00; /* Optional hover color for better visibility */
-}
-
-/* Floating logo hover effect */
-.floating-logo:hover {
-  transform: rotate(360deg) scale(1.2);
-  transition: transform 0.5s ease-in-out;
-}
-
-/* Smooth scrolling for the whole page */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Highlight active link in the schedule */
-.opponent-link.active {
-  font-weight: bold;
-  color: #ffcc00; /* Yellow highlight */
-  text-decoration: underline;
-}
-
-/* Breaking News Styling */
-.breaking-news-post {
-  animation: fadeInBounce 1.5s ease-out;
-  border: 2px solid #ffcc00;
-  box-shadow: 0 0 15px rgba(255, 204, 0, 0.8); /* Glow effect */
-  padding: 20px;
-  margin: 10px auto;
-  border-radius: 10px;
-  background: white;
-}
-
-.breaking-news-post h3 {
-  color: #fa4616;
-  margin-bottom: 10px;
-}
-
-.breaking-news-post p.author {
-  font-weight: bold;
-  color: #0021a5;
-  margin-bottom: 5px;
-}
-
-.breaking-news-post p.timestamp {
-  font-style: italic;
-  color: #666;
-}
-
-.reply-container {
-  margin-top: 20px;
-}
-
-.reply {
-  display: flex;
-  align-items: flex-start;
-  margin: 10px 0;
-}
-
-.reply .profile-pic {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-  background-size: cover;
-}
-
-.reply .comment {
-  background: #f4f4f9;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 10px;
-  max-width: 80%;
-}
-
-.like-reply-buttons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-}
-
-button.like-btn, button.reply-btn {
-  background-color: #fa4616;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 5px 10px;
-  font-family: 'Bebas Neue', sans-serif;
-  cursor: pointer;
-}
-
-button.like-btn:hover, button.reply-btn:hover {
-  background-color: #0021a5;
-}
-
-
-</style>
-
+        @media (max-width: 640px) {
+            .container { padding: 1.5rem; max-width: 100%;}
+            .header h1 { font-size: 2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .stat-card p { font-size: 2.5rem; }
+            .controls-section .button-group { flex-direction: column; } /* Keep controls stacked */
+            .controls-section .button-group .btn { width: 100%; }
+            .perks-section .button-group { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); } /* Adjust grid for mobile */
+            .btn { font-size: 0.7rem; padding: 0.5rem 0.7rem; min-height: 45px;}
+            .controls-section h3, .perks-section h3 { font-size: 1.2rem; }
+            .perks-section h4 { font-size: 0.9rem; }
+        }
+    </style>
 </head>
 <body>
-  <header style="position: relative; height: 400px; overflow: hidden; text-align: center;">
-
-  <!-- Animated Gradient Background -->
-  <div style="
-         position: absolute; 
-         top: 0; 
-         left: 0; 
-         width: 100%; 
-         height: 100%; 
-         background: linear-gradient(
-           135deg,
-           #0021a5,   /* Gators Blue */
-           #fa4616,   /* Gators Orange */
-           #ffcc00,   /* Gators Gold */
-           #24a148,   /* Gators Green */
-           #0021a5    /* Gators Blue */
-         ); 
-         background-size: 400% 100%; 
-         animation: diagonalShift 600s linear infinite; 
-         z-index: 0;">
-  </div>
-
-  <!-- Glowing Gators Logo -->
-  <img src="https://i.postimg.cc/tRVjQbYf/florida-gators-logotyp-us.png" 
-       alt="Gators Logo" 
-       style="width: 400px; height: auto; filter: drop-shadow(0 0 20px #ffcc00); animation: logoPulse 2s infinite alternate; position: relative; z-index: 1;">
-
-  <!-- Swamp Social Text -->
-  <div style="
-         position: absolute; 
-         top: 70%; 
-         left: 50%; 
-         transform: translate(-50%, -50%); 
-         text-align: center; 
-         color: white; 
-         text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.8); 
-         z-index: 2;">
-    <h1 style="
-         font-size: 3.5em; 
-         font-family: 'Bebas Neue', sans-serif; 
-         text-transform: uppercase; 
-         margin: 0;">
-      Swamp Social
-    </h1>
-    <p style="
-         color: #ffcc00; 
-         font-style: italic; 
-         font-size: 1.2em;">
-      Your hub for everything Florida Gators football
-    </p>
-  </div>
-
-  <!-- Keyframes for Animations -->
-  <style>
-    /* Animate Gradient's Background Position */
-    @keyframes diagonalShift {
-      0% {
-        background-position: 0% 50%;
-      }
-      100% {
-        background-position: 100% 50%;
-      }
-    }
-
-    /* Glow Effect for Logo */
-    @keyframes logoPulse {
-      0% {
-        filter: drop-shadow(0 0 15px #ffcc00);
-      }
-      50% {
-        filter: drop-shadow(0 0 40px #fa4616);
-      }
-      100% {
-        filter: drop-shadow(0 0 15px #ffcc00);
-      }
-    }
-.highlights-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.highlight {
-  text-align: center;
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 10px;
-  border: 2px solid #fa4616;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.highlight h3 {
-  color: #0021a5;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.5em;
-  margin-bottom: 10px;
-}
-
-.screenshot-gallery {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.highlight-screenshot {
-  width: 150px;
-  height: auto;
-  border: 3px solid #ffcc00;
-  border-radius: 5px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-}
-
-/* Style for Image Gallery */
-#photo-gallery {
-  position: relative;
-  max-width: 560px;
-  height: 315px;
-  margin: 0 auto;
-  overflow: hidden;
-  border: 3px solid #fa4616;
-  border-radius: 10px;
-}
-
-.gallery-img {
-  position: absolute;
-  top: 0;
-  left: 100%;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: all 0.5s ease-in-out;
-}
-
-.gallery-img.active {
-  left: 0;
-  opacity: 1;
-}
-
-.gallery-btn {
-  display: inline-block;
-  margin: 10px;
-  padding: 10px 20px; 
-  background-color: #fa4616;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-family: 'Bebas Neue', sans-serif;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.gallery-btn:hover {
-  background-color: #0021a5;
-  transform: scale(1.1);
-}
-
-
-  </style>
-</header>
-
-
-
-
-
-  <nav>
-    <a href="#stats" onclick="showTab('stats')">Season Stats</a>
-    <a href="#schedule" onclick="showTab('schedule')">Season Schedule</a>
-    <a href="#news" onclick="showTab('news')">Gator Byte News</a>
-    <a href="#forum" onclick="showTab('forum')">Forum</a>
-    <a href="#quiz" onclick="showTab('quiz')">Quiz</a>
-    <a href="#highlights" onclick="showTab('highlights')">Highlights</a>
-
-  </nav>
-
-  <div id="stats" class="tab-content hidden">
-  <h2>Season Stats</h2>
-  
-  <!-- Passing Stats -->
-  <h3>Passing</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Position</th>
-        <th>Yards</th>
-        <th>Completions</th>
-        <th>Attempts</th>
-        <th>Touchdowns</th>
-        <th>Interceptions</th>
-        <th>Yards/Attempt</th>
-        <th>Longest</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>DJ Lagway</td>
-        <td>QB</td>
-        <td>1,039</td>
-        <td>84</td>
-        <td>143</td>
-        <td>10</td>
-        <td>8</td>
-        <td>7.3</td>
-        <td>38</td>
-      </tr>
-      <tr>
-        <td>Parker Leise</td>
-        <td>QB</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0.0</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>Graham Mertz</td>
-        <td>QB</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0.0</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>Clay Millen</td>
-        <td>QB</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0.0</td>
-        <td>0</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  <!-- Rushing Stats -->
-  <h3>Rushing</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Position</th>
-        <th>Carries</th>
-        <th>Yards</th>
-        <th>Average</th>
-        <th>Touchdowns</th>
-        <th>Fumbles</th>
-        <th>Longest</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Montrell Johnson Jr.</td>
-        <td>HB</td>
-        <td>46</td>
-        <td>219</td>
-        <td>4.8</td>
-        <td>1</td>
-        <td>0</td>
-        <td>73</td>
-      </tr>
-      <tr>
-        <td>Treyaun Webb</td>
-        <td>HB</td>
-        <td>10</td>
-        <td>59</td>
-        <td>5.9</td>
-        <td>0</td>
-        <td>0</td>
-        <td>19</td>
-      </tr>
-      <tr>
-        <td>DJ Lagway</td>
-        <td>QB</td>
-        <td>15</td>
-        <td>41</td>
-        <td>2.7</td>
-        <td>1</td>
-        <td>1</td>
-        <td>13</td>
-      </tr>
-      <tr>
-        <td>Cam Carroll</td>
-        <td>HB</td>
-        <td>2</td>
-        <td>22</td>
-        <td>11.0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>22</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  <!-- Receiving Stats -->
-  <h3>Receiving</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Position</th>
-        <th>Receptions</th>
-        <th>Yards</th>
-        <th>Average</th>
-        <th>Touchdowns</th>
-        <th>Longest</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Montrell Johnson Jr.</td>
-        <td>HB</td>
-        <td>25</td>
-        <td>272</td>
-        <td>10.9</td>
-        <td>2</td>
-        <td>23</td>
-      </tr>
-      <tr>
-        <td>Eugene Wilson III</td>
-        <td>WR</td>
-        <td>12</td>
-        <td>178</td>
-        <td>14.8</td>
-        <td>1</td>
-        <td>38</td>
-      </tr>
-      <tr>
-        <td>Arlis Boardingham</td>
-        <td>TE</td>
-        <td>11</td>
-        <td>168</td>
-        <td>15.3</td>
-        <td>2</td>
-        <td>27</td>
-      </tr>
-      <tr>
-        <td>Chimere Dike</td>
-        <td>WR</td>
-        <td>12</td>
-        <td>144</td>
-        <td>12.0</td>
-        <td>2</td>
-        <td>47</td>
-      </tr>
-      <tr>
-        <td>Elijah Badger</td>
-        <td>WR</td>
-        <td>10</td>
-        <td>122</td>
-        <td>12.2</td>
-        <td>2</td>
-        <td>35</td>
-      </tr>
-      <tr>
-        <td>Trayaun Webb</td>
-        <td>HB</td>
-        <td>4</td>
-        <td>65</td>
-        <td>16.3</td>
-        <td>1</td>
-        <td>36</td>
-      </tr>
-      <tr>
-        <td>Hayden Hansen</td>
-        <td>TE</td>
-        <td>4</td>
-        <td>38</td>
-        <td>9.5</td>
-        <td>0</td>
-        <td>19</td>
-      </tr>
-	<tr>
-        <td>Keon Zipperer</td>
-        <td>TE</td>
-        <td>2</td>
-        <td>24</td>
-        <td>12.0</td>
-        <td>0</td>
-        <td>12</td>
-      </tr>
-	<tr>
-        <td>Marcus Burke</td>
-        <td>WR</td>
-        <td>3</td>
-        <td>19</td>
-        <td>6.3</td>
-        <td>0</td>
-        <td>11</td>
-      </tr>
-	<tr>
-        <td>Aidan Mizell</td>
-        <td>WR</td>
-        <td>1</td>
-        <td>9</td>
-        <td>9.0</td>
-        <td>0</td>
-        <td>9</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-
-    <!-- Updated Season Schedule -->
-<div id="schedule" class="tab-content hidden">
-  <h2>Season Schedule</h2>
-  <table class="schedule-table">
-    <thead>
-      <tr>
-        <th>Week</th>
-        <th>Date</th>
-        <th>Opponent</th>
-        <th>Location</th>
-        <th>Result</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>0</td>
-        <td>Sat, Aug 24</td>
-        <td><a href="#week-0" class="opponent-link" data-week="0">Texas</a></td>
-        <td>Austin, TX</td>
-        <td>L 37-10</td>
-      </tr>
-      <tr>
-        <td>1</td>
-        <td>Sat, Aug 31</td>
-        <td><a href="#week-1" class="opponent-link" data-week="1">Miami</a></td>
-        <td>Home</td>
-        <td>L 21-20</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>Sat, Sep 7</td>
-        <td><a href="#week-2" class="opponent-link" data-week="2">FCS Southeast</a></td>
-        <td>Home</td>
-        <td>W 56-0</td>
-      </tr>
-      <!-- Upcoming Games -->
-      <tr>
-        <td>3</td>
-        <td>Sat, Sep 14</td>
-        <td>Texas A&M</td>
-        <td>College Station, TX</td>
-        <td>Pending</td>
-      </tr>
-      <tr>
-        <td>4</td>
-        <td>Sat, Sep 21</td>
-        <td>Vanderbilt</td>
-        <td>Home</td>
-        <td>Pending</td>
-      </tr>
-      <tr>
-        <td>5</td>
-        <td>Sat, Sep 28</td>
-        <td>BYE</td>
-        <td>-</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>6</td>
-        <td>Sat, Oct 5</td>
-        <td>BYE</td>
-        <td>-</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>7</td>
-        <td>Sat, Oct 12</td>
-        <td>BYE</td>
-        <td>-</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>8</td>
-        <td>Sat, Oct 19</td>
-        <td>#6 Alabama</td>
-        <td>Home</td>
-        <td>Pending</td>
-      </tr>
-      <tr>
-        <td>9</td>
-        <td>Thu, Oct 24</td>
-        <td>Arkansas</td>
-        <td>Fayetteville, AR</td>
-        <td>Pending</td>
-      </tr>
-      <tr>
-        <td>10</td>
-        <td>Sat, Nov 2</td>
-        <td>#1 Georgia</td>
-        <td>Home</td>
-        <td>Pending</td>
-      </tr>
-      <tr>
-        <td>11</td>
-        <td>Sat, Nov 9</td>
-        <td>#25 Auburn</td>
-        <td>Auburn, AL</td>
-        <td>Pending</td>
-      </tr>
-      <tr>
-        <td>12</td>
-        <td>Sat, Nov 16</td>
-        <td>#22 LSU</td>
-        <td>Home</td>
-        <td>Pending</td>
-      </tr>
-      <tr>
-        <td>13</td>
-        <td>Sat, Nov 23</td>
-        <td>Ole Miss</td>
-        <td>Home</td>
-        <td>Pending</td>
-      </tr>
-      <tr>
-        <td>14</td>
-        <td>Sat, Nov 30</td>
-        <td>#23 Florida State</td>
-        <td>Tallahassee, FL</td>
-        <td>Pending</td>
-      </tr>
-      <tr>
-        <td>15</td>
-        <td>Sat, Dec 7</td>
-        <td>BYE</td>
-        <td>-</td>
-        <td>-</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- Week 0 Stats Page -->
-<div id="week-0" class="tab-content hidden">
-  <h2>Week 0 - Florida Gators Player Stats vs. Texas</h2>
-  <h3>Passing</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Rating</th>
-        <th>Yards</th>
-        <th>TD</th>
-        <th>INT</th>
-        <th>Long</th>
-        <th>Sacks</th>
-        <th>COMP</th>
-        <th>ATT</th>
-        <th>COMP%</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>D. Lagway</td>
-        <td>103.2</td>
-        <td>350</td>
-        <td>1</td>
-        <td>3</td>
-        <td>33</td>
-        <td>3</td>
-        <td>27</td>
-        <td>52</td>
-        <td>51%</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h3>Rushing</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>CAR</th>
-        <th>Yards</th>
-        <th>AVG</th>
-        <th>TD</th>
-        <th>FUM</th>
-        <th>LONG</th>
-        <th>20+</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>M. Johnson Jr.</td>
-        <td>12</td>
-        <td>57</td>
-        <td>4.8</td>
-        <td>0</td>
-        <td>0</td>
-        <td>25</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>T. Webb</td>
-        <td>1</td>
-        <td>9</td>
-        <td>9.0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>9</td>
-        <td>0</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h3>Receiving</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>REC</th>
-        <th>Yards</th>
-        <th>AVG</th>
-        <th>TD</th>
-        <th>RAC</th>
-        <th>LONG</th>
-        <th>DROPS</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>M. Johnson Jr.</td>
-        <td>9</td>
-        <td>96</td>
-        <td>10.7</td>
-        <td>0</td>
-        <td>4.0</td>
-        <td>20</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>E. Wilson III</td>
-        <td>6</td>
-        <td>86</td>
-        <td>14.3</td>
-        <td>0</td>
-        <td>6.0</td>
-        <td>33</td>
-        <td>1</td>
-      </tr>
-        <td>A. Boardingham</td>
-        <td>3</td>
-        <td>53</td>
-        <td>17.7</td>
-        <td>0</td>
-        <td>1.7</td>
-        <td>27</td>
-        <td>1</td>
-      </tr>
-	</tr>
-        <td>C. Dike</td>
-        <td>4</td>
-        <td>52</td>
-        <td>13.0</td>
-        <td>1</td>
-        <td>2.5</td>
-        <td>26</td>
-        <td>0</td>
-      </tr>
-	</tr>
-        <td>E. Badger</td>
-        <td>2</td>
-        <td>31</td>
-        <td>15.5</td>
-        <td>0</td>
-        <td>1.5</td>
-        <td>26</td>
-        <td>0</td>
-      </tr>
-	<tr>
-        <td>K. Zippier</td>
-        <td>2</td>
-        <td>24</td>
-        <td>12.0</td>
-        <td>0</td>
-        <td>8.0</td>
-        <td>12</td>
-        <td>1</td>
-      </tr>
-	<tr>
-        <td>H. Hansen</td>
-        <td>1</td>
-        <td>8</td>
-        <td>8.0</td>
-        <td>0</td>
-        <td>3.0</td>
-        <td>8</td>
-        <td>1</td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
-<script>
-  // Unified Tab Navigation and Scrolling Function
-const tabLinks = document.querySelectorAll(".opponent-link");
-const tabContents = document.querySelectorAll(".tab-content");
-
-// Add click event listeners to all schedule links
-tabLinks.forEach(link => {
-  link.addEventListener("click", event => {
-    event.preventDefault(); // Prevent default link behavior
-
-    // Get the target tab ID from the link's href
-    const targetTabId = link.getAttribute("href").substring(1);
-
-    // Hide all tab contents and remove animations
-    tabContents.forEach(tab => {
-      tab.classList.add("hidden");
-      tab.classList.remove("animate"); // Reset animation class
-    });
-
-    // Show the targeted tab and add animation
-    const targetTab = document.getElementById(targetTabId);
-    if (targetTab) {
-      targetTab.classList.remove("hidden");
-      targetTab.classList.add("animate");
-      targetTab.scrollIntoView({ behavior: "smooth" }); // Smooth scrolling
-    }
-
-    // Highlight the active link
-    tabLinks.forEach(link => link.classList.remove("active"));
-    link.classList.add("active");
-  });
-});
-
-// Dynamically add CSS for active link styling
-const style = document.createElement("style");
-style.innerHTML = `
-  .opponent-link.active {
-    font-weight: bold;
-    color: #ffcc00; /* Highlight color */
-    text-decoration: underline;
-  }
-`;
-document.head.appendChild(style);
- 
-
-</script>
-
-<!-- Week 1 Stats Page -->
-<div id="week-1" class="tab-content hidden">
-  <h2>Week 1 - Florida Gators Player Stats vs. Miami</h2>
-  
-  <h3>Passing</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Rating</th>
-        <th>Yards</th>
-        <th>TD</th>
-        <th>INT</th>
-        <th>Long</th>
-        <th>Sacks</th>
-        <th>COMP</th>
-        <th>ATT</th>
-        <th>COMP%</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>D. Lagway</td>
-        <td>115.2</td>
-        <td>359</td>
-        <td>2</td>
-        <td>4</td>
-        <td>35</td>
-        <td>1</td>
-        <td>30</td>
-        <td>51</td>
-        <td>58%</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h3>Rushing</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>CAR</th>
-        <th>Yards</th>
-        <th>AVG</th>
-        <th>TD</th>
-        <th>FUM</th>
-        <th>LONG</th>
-        <th>20+</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>M. Johnson Jr.</td>
-        <td>14</td>
-        <td>28</td>
-        <td>2.0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>11</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>T. Webb</td>
-        <td>1</td>
-        <td>10</td>
-        <td>10.0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>10</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>D. Lagway</td>
-        <td>5</td>
-        <td>8</td>
-        <td>1.6</td>
-        <td>1</td>
-        <td>0</td>
-        <td>5</td>
-        <td>0</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h3>Receiving</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>REC</th>
-        <th>Yards</th>
-        <th>AVG</th>
-        <th>TD</th>
-        <th>RAC</th>
-        <th>LONG</th>
-        <th>DROPS</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>M. Johnson Jr.</td>
-        <td>11</td>
-        <td>122</td>
-        <td>11.1</td>
-        <td>2</td>
-        <td>8.0</td>
-        <td>23</td>
-        <td>2</td>
-      </tr>
-      <tr>
-        <td>E. Badger</td>
-        <td>4</td>
-        <td>81</td>
-        <td>20.3</td>
-        <td>0</td>
-        <td>20.0</td>
-        <td>88</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>C. Dike</td>
-        <td>5</td>
-        <td>65</td>
-        <td>13.0</td>
-        <td>0</td>
-        <td>26.0</td>
-        <td>18</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>A. Boardingham</td>
-        <td>3</td>
-        <td>35</td>
-        <td>11.7</td>
-        <td>0</td>
-        <td>5.0</td>
-        <td>15</td>
-        <td>0</td>
-      </tr>
-	<tr>
-        <td>E. Wilson III</td>
-        <td>2</td>
-        <td>22</td>
-        <td>11.0</td>
-        <td>0</td>
-        <td>1.0</td>
-        <td>12</td>
-        <td>2</td>
-      </tr>
-	<tr>
-        <td>M. Burke</td>
-        <td>3</td>
-        <td>19</td>
-        <td>6.3</td>
-        <td>0</td>
-        <td>2.3</td>
-        <td>11</td>
-        <td>0</td>
-      </tr>
-	<tr>
-        <td>A. Mizel</td>
-        <td>1</td>
-        <td>9</td>
-        <td>9.0</td>
-        <td>0</td>
-        <td>1.0</td>
-        <td>9</td>
-        <td>0</td>
-      </tr>
-	<tr>
-        <td>H. Hansen</td>
-        <td>1</td>
-        <td>6</td>
-        <td>6.0</td>
-        <td>0</td>
-        <td>0.0</td>
-        <td>6</td>
-        <td>1</td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
-<script>
-  // Add functionality to dynamically switch between weeks
-  const tabLinks = document.querySelectorAll(".opponent-link");
-  const tabContents = document.querySelectorAll(".tab-content");
-
-  tabLinks.forEach(link => {
-    link.addEventListener("click", (event) => {
-      event.preventDefault();
-      const targetTab = event.target.getAttribute("href").substring(1);
-
-      tabContents.forEach(content => content.classList.add("hidden"));
-      document.getElementById(targetTab).classList.remove("hidden");
-    });
-  });
-
-  function showTab(tabId) {
-    tabContents.forEach(content => content.classList.add("hidden"));
-    document.getElementById(tabId).classList.remove("hidden");
-  }
-</script>
-
-<!-- Week 2 Stats Page -->
-<div id="week-2" class="tab-content hidden">
-  <h2>Week 2 - Florida Gators Player Stats vs. FCS Southeast</h2>
-  
-  <h3>Passing</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Rating</th>
-        <th>Yards</th>
-        <th>TD</th>
-        <th>INT</th>
-        <th>Long</th>
-        <th>Sacks</th>
-        <th>COMP</th>
-        <th>ATT</th>
-        <th>COMP%</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>D. Lagway</td>
-        <td>189.5</td>
-        <td>330</td>
-        <td>7</td>
-        <td>1</td>
-        <td>38</td>
-        <td>0</td>
-        <td>27</td>
-        <td>40</td>
-        <td>67%</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h3>Rushing</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>CAR</th>
-        <th>Yards</th>
-        <th>AVG</th>
-        <th>TD</th>
-        <th>FUM</th>
-        <th>LONG</th>
-        <th>20+</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>M. Johnson Jr.</td>
-        <td>20</td>
-        <td>134</td>
-        <td>6.7</td>
-        <td>1</td>
-        <td>0</td>
-        <td>34</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>T. Webb</td>
-        <td>8</td>
-        <td>40</td>
-        <td>5.0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>13</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>D. Lagway</td>
-        <td>3</td>
-        <td>34</td>
-        <td>11.3</td>
-        <td>0</td>
-        <td>0</td>
-        <td>18</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>C. Carroll</td>
-        <td>2</td>
-        <td>22</td>
-        <td>11.0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>12</td>
-        <td>0</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h3>Receiving</h3>
-  <table class="stats-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>REC</th>
-        <th>Yards</th>
-        <th>AVG</th>
-        <th>TD</th>
-        <th>RAC</th>
-        <th>LONG</th>
-        <th>DROPS</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>A. Boardingham</td>
-        <td>5</td>
-        <td>80</td>
-        <td>16.0</td>
-        <td>2</td>
-        <td>5.8</td>
-        <td>27</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>E. Wilson III</td>
-        <td>4</td>
-        <td>70</td>
-        <td>17.5</td>
-        <td>1</td>
-        <td>2.3</td>
-        <td>38</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>T. Webb</td>
-        <td>4</td>
-        <td>65</td>
-        <td>16.3</td>
-        <td>1</td>
-        <td>19.0</td>
-        <td>36</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>M. Johnson Jr.</td>
-        <td>5</td>
-        <td>54</td>
-        <td>10.8</td>
-        <td>0</td>
-        <td>11.0</td>
-        <td>18</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>C. Dike</td>
-        <td>3</td>
-        <td>27</td>
-        <td>9.0</td>
-        <td>1</td>
-        <td>3.7</td>
-        <td>14</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>H. Hansen</td>
-        <td>2</td>
-        <td>24</td>
-        <td>12.0</td>
-        <td>0</td>
-        <td>2.0</td>
-        <td>19</td>
-        <td>0</td>
-      </tr>
-	<tr>
-        <td>E. Badger</td>
-        <td>4</td>
-        <td>10</td>
-        <td>2.5</td>
-        <td>2</td>
-        <td>1.5</td>
-        <td>7</td>
-        <td>1</td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
-
- <!-- Gator Byte News -->
-<div id="news" class="tab-content hidden">
-  <h2>Gator Byte News Podcast</h2>
-  <div class="podcast">
-    <!-- Embedded Vimeo Video -->
-    <iframe 
-      src="https://player.vimeo.com/video/1030420949" 
-      width="600" 
-      height="338" 
-      frameborder="0" 
-      allow="autoplay; fullscreen; picture-in-picture" 
-      allowfullscreen>
-    </iframe>
-    <p>Latest insights from Coach Brick Dupp on the Gators' season.</p>
-  </div>
-</div>
-
-
-
-    <div id="forum" class="tab-content">
-  <h2>Breaking News</h2>
-  <div id="forum-post-container" class="breaking-news-post">
-    <!-- Randomized breaking news post will appear here -->
-  </div>
-  <div class="reply-container">
-    <h3>Replies</h3>
-    <div id="replies"></div>
-    <input type="text" id="reply-input" placeholder="Write a reply as @BrickDupp..." />
-    <button class="reply-btn" onclick="addUserReply()">Reply</button>
-  </div>
-</div>
-
-<div id="quiz" class="tab-content hidden">
-  <h2>Florida Gators Football Quiz</h2>
-  <div id="quiz-container">
-    <!-- Quiz content will be dynamically injected here -->
-  </div>
-</div>
-
-
-<script>
-  // Breaking News Articles Array
-const breakingNewsPosts = [
-  {
-    headline: "DJ Lagway Battles Minor Ankle Injury in Practice",
-    content: "DJ Lagway tweaked his ankle during scramble drills at practice. Sources report he’s day-to-day and expected to return by the end of the week.",
-    timestamp: "10:45 AM - November 17, 2024",
-    likes: 15,
-    replies: [
-      { user: "@GatorFan99", comment: "Hope DJ is back for the big game!" },
-      { user: "@SwampKing", comment: "We need him at full strength for Alabama." }
-    ],
-  },
-  {
-    headline: "Montrell Johnson Jr. Sidelined with Wrist Sprain",
-    content: "Montrell Johnson Jr. suffered a minor wrist sprain during a weightlifting session. Trainers expect him to miss two days of practice but play on Saturday.",
-    timestamp: "9:30 AM - November 16, 2024",
-    likes: 25,
-    replies: [{ user: "@GatorLoyal", comment: "Good thing it's nothing serious." }],
-  },
-  {
-    headline: "BREAKING: Florida Gators Meeting With Five-Star Recruit",
-    content: "The Florida Gators are nearing a commitment from five-star running back recruit Silas Colman. Colman is ranked as the #2 RB in the nation.",
-    timestamp: "12:00 PM - November 14, 2024",
-    likes: 45,
-    replies: [
-      { user: "@RecruitWatcher", comment: "This kid is the real deal!" },
-      { user: "@HurriKane", comment: "If this guy goes to UF I am burning his Jersey!" },
-      { user: "@GatorChomp", comment: "Colman is going to dominate in The Swamp!" },
-    ],
-  },
-  {
-    headline: "DJ Lagway Hosts Study Session in the Library",
-    content: "Freshman phenom DJ Lagway was spotted leading a study group in the university library’s study pods. Known for his composure on the field, Lagway used the same precision to help his peers ace their Calculus exam.",
-    timestamp: "5:20 PM - November 15, 2024",
-    likes: 32,
-    replies: [
-      { user: "@GatorNation", comment: "QB1 crushing it on AND off the field. Future leader of the Swamp!" },
-      { user: "@LibraryLizard", comment: "Saw DJ explaining derivatives in the library. The guy's a genius!" },
-      { user: "@RollTideRealTalk", comment: "Guess he’s gotta shine somewhere since Bama locked him down last week." },
-    ],
-  },
-  {
-    headline: "Eugene Wilson III Volunteers at Local Shelter",
-    content: "Wide receiver Eugene Wilson III spent his Saturday volunteering at the Gainesville Homeless Shelter, distributing meals and sharing stories about life as a student-athlete.",
-    timestamp: "11:00 AM - November 13, 2024",
-    likes: 40,
-    replies: [
-      { user: "@SwampFanatic", comment: "Eugene’s a star on and off the field!" },
-      { user: "@CharityChaser", comment: "This is what it means to be a Gator!" },
-      { user: "@DawgPoundRage", comment: "He can do charity work all he wants. Dawgs are still winning." },
-    ],
-  },
-  {
-    headline: "Montrell Johnson Jr. Hosts Campus Yoga Class",
-    content: "Running back Montrell Johnson Jr. partnered with UF’s Health and Wellness Club to host a yoga class at the student gym, showing his flexibility is as elite as his footwork.",
-    timestamp: "2:00 PM - November 12, 2024",
-    likes: 28,
-    replies: [
-      { user: "@StretchySwamp", comment: "I joined this class! Montrell’s balance is unreal." },
-      { user: "@YogaWarrior99", comment: "How do I get on the invite list?" },
-      { user: "@FumbleHaters", comment: "Let’s hope his hands stay flexible enough to hold the ball!" },
-    ],
-  },
-  {
-    headline: "Kelby Collins Participates in UF Robotics Club Demo",
-    content: "Defensive end Kelby Collins surprised students by showcasing his programming skills during a UF Robotics Club demo, wowing the crowd by coding a robot that executed a perfect touchdown celebration.",
-    timestamp: "4:45 PM - November 10, 2024",
-    likes: 50,
-    replies: [
-      { user: "@STEMFanGator", comment: "A robot with a Gator Chomp? Sign me up!" },
-      { user: "@TechieTiger", comment: "Even Gators can’t out-program Auburn’s engineering squad." },
-      { user: "@CollinsFan123", comment: "Kelby might have a future in tech after football!" },
-    ],
-  },
-  {
-    headline: "Treyaun Webb Delivers Motivational Speech to Freshmen",
-    content: "Treyaun Webb spoke to incoming freshmen about perseverance and teamwork during UF’s Freshman Orientation, sharing his journey as a student-athlete to inspire the next generation.",
-    timestamp: "9:15 AM - November 9, 2024",
-    likes: 35,
-    replies: [
-      { user: "@InspiringGator", comment: "Treyaun’s speech gave me chills!" },
-      { user: "@UF_Freshman", comment: "I got to meet him after! Total class act." },
-      { user: "@LSUFan4Lyfe", comment: "Great speech, but LSU still runs the SEC." },
-    ],
-  },
-  {
-    headline: "Gators Defensive Line Attends Film Screening",
-    content: "Florida’s defensive line, including Justus Boone, attended a campus screening of “Remember the Titans” to study leadership and team dynamics. Boone called it 'a great lesson in unity.'",
-    timestamp: "6:30 PM - November 8, 2024",
-    likes: 22,
-    replies: [
-      { user: "@MovieBuffGator", comment: "Love that our team focuses on the mental game too!" },
-      { user: "@TitanTalker", comment: "Best football movie ever. Boone’s got good taste." },
-      { user: "@BamaForever", comment: "Too bad they can’t tackle like the Titans defense." },
-    ],
-  },
-  {
-    headline: "Jason Marshall Jr. Joins UF Debate Club for Mock Trial",
-    content: "Cornerback Jason Marshall Jr. participated in a mock trial hosted by UF’s Debate Club, dazzling the crowd with his quick wit and strategic thinking.",
-    timestamp: "3:45 PM - November 7, 2024",
-    likes: 48,
-    replies: [
-      { user: "@MarshallFan", comment: "Jason’s lockdown skills extend to the courtroom!" },
-      { user: "@DebateKing", comment: "He had the whole room eating out of his hand." },
-      { user: "@TrashTalker34", comment: "Too bad he can’t debate Georgia out of the top spot." },
-    ],
-  },
-{
-  headline: "Ja’Keem Jackson Becomes UF Art Club’s Newest Star",
-  content: "Cornerback Ja’Keem Jackson displayed his creative side by painting a mural on campus as part of UF’s Art Club event. The mural, featuring a roaring Gator, was hailed as a masterpiece by fellow students.",
-  timestamp: "11:30 AM - November 16, 2024",
-  likes: 38,
-  replies: [
-    { user: "@ArtisticGator", comment: "Ja’Keem’s got skills! The mural is epic!" },
-    { user: "@SketchyFan", comment: "Can we get posters of this in the bookstore?" },
-    { user: "@TigerTroll", comment: "Too bad his coverage skills aren’t this good." },
-  ],
-},
-{
-  headline: "Trevor Etienne Teaches Dance at Campus Workshop",
-  content: "Running back Trevor Etienne showed off his footwork by leading a dance workshop at the UF Student Union. Known for his agility on the field, Etienne proved he’s just as graceful in the dance studio.",
-  timestamp: "3:00 PM - November 15, 2024",
-  likes: 42,
-  replies: [
-    { user: "@DanceFanatic", comment: "I didn’t know Trevor could moonwalk! Amazing class!" },
-    { user: "@GatorGroove", comment: "Trevor’s moves are as smooth as his runs." },
-    { user: "@RivalRant", comment: "Guess he’s training for his next loss to Georgia." },
-  ],
-},
-{
-  headline: "Kamari Wilson Mentors Future Engineers",
-  content: "Safety Kamari Wilson partnered with UF’s Engineering Department to mentor high school students during a campus STEM fair. Wilson called the experience 'eye-opening' and pledged to continue supporting education initiatives.",
-  timestamp: "1:45 PM - November 14, 2024",
-  likes: 50,
-  replies: [
-    { user: "@GatorTech", comment: "Kamari inspires on AND off the field!" },
-    { user: "@FutureEngineer", comment: "Meeting Kamari today was life-changing!" },
-    { user: "@SeminoleSnark", comment: "Didn’t know tackling engineering problems was his specialty." },
-  ],
-},
-{
-  headline: "Aidan Mizell Launches Campus Fitness Challenge",
-  content: "Wide receiver Aidan Mizell teamed up with UF’s Wellness Center to launch a campus-wide fitness challenge. Mizell’s goal: to get every participant to complete a mile-long sprint on campus in under 7 minutes.",
-  timestamp: "10:15 AM - November 13, 2024",
-  likes: 37,
-  replies: [
-    { user: "@FitnessFan", comment: "Challenge accepted! Aidan’s got me running daily!" },
-    { user: "@UFHealth", comment: "What an awesome way to promote wellness!" },
-    { user: "@BulldogRival", comment: "Mizell should focus more on catching passes than sprints." },
-  ],
-},
-{
-  headline: "Austin Barber Helps Design UF's New Solar Field",
-  content: "Offensive lineman Austin Barber joined UF’s Sustainability Club to help plan the university’s new solar energy field. Barber joked that 'going green' isn’t just for field goals anymore.",
-  timestamp: "2:30 PM - November 12, 2024",
-  likes: 29,
-  replies: [
-    { user: "@EcoGator", comment: "Austin protecting more than the QB! What a guy!" },
-    { user: "@UFStudent123", comment: "Barber’s a hero in the trenches and in sustainability." },
-    { user: "@RollTideRealTalk", comment: "Cool story. Too bad he can’t protect his QB from Bama’s D-line." },
-  ],
-},
-{
-  headline: "Jalen Kimber Stars in Student Film",
-  content: "Cornerback Jalen Kimber showcased his acting chops in a student-produced short film at UF’s annual Film Festival. Critics called Kimber’s performance 'captivating,' sparking talk of a Hollywood future.",
-  timestamp: "6:00 PM - November 11, 2024",
-  likes: 33,
-  replies: [
-    { user: "@FilmBuffGator", comment: "Jalen’s got the charisma of a superstar!" },
-    { user: "@TheaterKidUF", comment: "His performance was AMAZING. Oscar-worthy!" },
-    { user: "@GatorHater99", comment: "Should stick to football. He’s no Denzel." },
-  ],
-},
-{
-  headline: "Jordan Castell Wins UF Science Fair with Physics Project",
-  content: "Freshman Jordan Castell stunned the campus by winning UF’s annual science fair. His project, which explored aerodynamics in football passes, earned him praise from professors and peers alike.",
-  timestamp: "8:30 AM - November 10, 2024",
-  likes: 46,
-  replies: [
-    { user: "@STEMFanatic", comment: "Smart and athletic. Gators recruit the best!" },
-    { user: "@FutureQB", comment: "Castell just redefined how we think about football throws." },
-    { user: "@TrollTide", comment: "Aerodynamics? Maybe he should focus on stopping WRs." },
-  ],
-},
-{
-  headline: "Justus Boone Coaches Kids at Gator Youth Camp",
-  content: "Defensive lineman Justus Boone spent his weekend coaching kids at the Gator Youth Football Camp, teaching them the fundamentals of tackling and teamwork.",
-  timestamp: "4:00 PM - November 9, 2024",
-  likes: 39,
-  replies: [
-    { user: "@SwampFamily", comment: "My kid loved working with Boone today!" },
-    { user: "@FootballMom", comment: "Justus has a gift for inspiring the next generation." },
-    { user: "@SeminoleStrife", comment: "Better watch out. Those kids might take his spot soon." },
-  ],
-},
-{
-  headline: "Miguel Mitchell Impresses at UF Cooking Club Contest",
-  content: "Safety Miguel Mitchell showcased his culinary talents by winning UF’s Cooking Club contest. His signature dish, Gator-themed sliders, was an instant hit with judges and students alike.",
-  timestamp: "7:15 PM - November 8, 2024",
-  likes: 41,
-  replies: [
-    { user: "@FoodieGator", comment: "Those sliders were INCREDIBLE. Miguel’s a chef!" },
-    { user: "@UFStudentChef", comment: "I need that recipe ASAP!" },
-    { user: "@TrashTalkTiger", comment: "Good to see he can cook, because LSU’s offense roasted him." },
-  ],
-},
-{
-  headline: "Princely Umanmielen Spearheads Campus Recycling Drive",
-  content: "Defensive lineman Princely Umanmielen led a campus-wide recycling drive that collected over 5 tons of material. His efforts earned recognition from the Gainesville City Council.",
-  timestamp: "9:00 AM - November 7, 2024",
-  likes: 58,
-  replies: [
-    { user: "@GreenGator", comment: "Princely making a princely impact on the environment!" },
-    { user: "@UFRecycler", comment: "I’m so proud of the team effort!" },
-    { user: "@GeorgiaFanatic", comment: "Too bad he can’t recycle last week’s loss to the Dawgs." },
-  ],
- },
-{
-    headline: "DJ Lagway Aces Freshman Speech Class Assignment",
-    content: "DJ Lagway impressed his peers and professor with a passionate speech about teamwork and leadership. His eloquence earned him a standing ovation in his freshman communications class.",
-    timestamp: "8:45 AM - November 16, 2024",
-    likes: 32,
-    replies: [
-      { user: "@GatorPride", comment: "Quarterback and a scholar! Love it." },
-      { user: "@CollegeCritic", comment: "Can’t wait for the TED Talk." },
-      { user: "@BamaFan45", comment: "Bet it’s easier to talk than throw against Bama." },
-    ],
-  },
-  {
-    headline: "Montrell Johnson Jr. Leads Yoga Session for the Team",
-    content: "In an effort to improve flexibility and reduce injuries, Montrell Johnson Jr. organized a yoga session for his teammates. Even Coach Dupp joined in for a few poses!",
-    timestamp: "2:15 PM - November 15, 2024",
-    likes: 41,
-    replies: [
-      { user: "@NamasteGator", comment: "Warrior pose = championship pose!" },
-      { user: "@StretchingFan22", comment: "This is why Montrell is a team leader." },
-      { user: "@TigerClaw", comment: "Yoga won't help y’all beat LSU!" },
-    ],
-  },
-  {
-    headline: "Jason Marshall Jr. Starts Weekly Campus Book Club",
-    content: "Star defensive back Jason Marshall Jr. launched a book club open to all students. The first read? ‘Mind Gym’ by Gary Mack to inspire mental toughness.",
-    timestamp: "5:00 PM - November 14, 2024",
-    likes: 28,
-    replies: [
-      { user: "@Reader4Life", comment: "Marshall locking down knowledge too!" },
-      { user: "@UFStudentReads", comment: "This is so cool. Sign me up!" },
-      { user: "@KnoxVolHater", comment: "No books will save y’all in Knoxville." },
-    ],
-  },
-  {
-    headline: "Eugene Wilson III Hosts Art Workshop for Elementary Kids",
-    content: "Wide receiver Eugene Wilson III shared his passion for painting by teaching local kids to draw their favorite football scenes during a weekend workshop.",
-    timestamp: "3:30 PM - November 13, 2024",
-    likes: 38,
-    replies: [
-      { user: "@ArtChomp", comment: "WR and artist? Eugene’s the full package." },
-      { user: "@GatorMom", comment: "My kid was there and loved it!" },
-      { user: "@RollTide15", comment: "This dude’s drawing losses next week." },
-    ],
-  },
-  {
-    headline: "Treyaun Webb Explores Campus Nature Trails for Fun",
-    content: "Running back Treyaun Webb took a break from football to hike the Lake Alice trails, documenting his journey with scenic photos on Instagram.",
-    timestamp: "10:15 AM - November 12, 2024",
-    likes: 19,
-    replies: [
-      { user: "@HikingGator", comment: "Love seeing players enjoy campus life!" },
-      { user: "@TrailblazerUF", comment: "Lake Alice is the best. Webb’s got good taste!" },
-      { user: "@UGABulldog", comment: "You’re hiking, we’re grinding." },
-    ],
-  },
-  {
-    headline: "Arlis Boardingham Wins Campus Karaoke Night",
-    content: "Tight end Arlis Boardingham brought the house down with a rendition of ‘Sweet Home Alabama’ at the student union karaoke event.",
-    timestamp: "7:00 PM - November 11, 2024",
-    likes: 44,
-    replies: [
-      { user: "@MusicFanatic", comment: "Alabama anthem? Brave choice, Arlis!" },
-      { user: "@SingItBoardingham", comment: "Next time, do a Gator fight song!" },
-      { user: "@VolNation", comment: "Hope he sings at Neyland after losing." },
-    ],
-  },
-  {
-    headline: "Shema James Volunteers at Local Animal Shelter",
-    content: "Linebacker Shemar James spent his day off helping out at a Gainesville animal shelter. He adopted a rescue puppy named Blitz.",
-    timestamp: "12:00 PM - November 10, 2024",
-    likes: 61,
-    replies: [
-      { user: "@GatorPetLover", comment: "Shemar’s heart is as big as his tackles!" },
-      { user: "@UFStudentLife", comment: "Now I want to adopt a pup too!" },
-      { user: "@HurricaneNation", comment: "This dog’s seeing losses like the Gators." },
-    ],
-  },
-  {
-    headline: "Cam Jackson Hosts Campus Cooking Class",
-    content: "Defensive lineman Cam Jackson shared his love for Cajun cuisine by teaching fellow students how to make gumbo in a campus event.",
-    timestamp: "1:45 PM - November 9, 2024",
-    likes: 36,
-    replies: [
-      { user: "@FoodieGator", comment: "Cam cooking up wins and gumbo!" },
-      { user: "@CajunFan44", comment: "Nothing beats homemade gumbo!" },
-      { user: "@BamaBBQ", comment: "Stick to football, chef." },
-    ],
-  },
-  {
-    headline: "Kelby Collins Organizes Dorm Movie Night",
-    content: "Defensive end Kelby Collins invited his dormmates to watch ‘Remember the Titans.’ Popcorn and Gatorade were provided for everyone.",
-    timestamp: "9:00 PM - November 8, 2024",
-    likes: 23,
-    replies: [
-      { user: "@DormLifeUF", comment: "Kelby keeping dorm life fun and spirited!" },
-      { user: "@PopcornKing", comment: "Best dorm night ever. Thanks, Kelby!" },
-      { user: "@SECTrashTalk", comment: "How about a live movie of y’all losing to LSU?" },
-    ],
-  },
-  {
-    headline: "Marcus Burke DJs at Campus Radio Station",
-    content: "Wide receiver Marcus Burke showcased his DJ skills by hosting a special hip-hop mix hour on the campus radio station.",
-    timestamp: "4:30 PM - November 7, 2024",
-    likes: 29,
-    replies: [
-      { user: "@RadioChomp", comment: "Burke dropping beats and catching passes!" },
-      { user: "@UFHipHop", comment: "Best radio show in weeks. Burke killed it!" },
-      { user: "@WarEagleFan", comment: "His music better than his football!" },
-    ],
-  },
-{
-    headline: "DJ Lagway Suspended for Skipping Mandatory Study Hall",
-    content: "Freshman quarterback DJ Lagway has been suspended for one game after missing a mandatory study hall session. Coach Dupp emphasized accountability in a team meeting.",
-    timestamp: "9:30 AM - November 16, 2024",
-    likes: 19,
-    replies: [
-      { user: "@GatorFanatic", comment: "Tough lesson for DJ, but he’ll bounce back." },
-      { user: "@UFStudent", comment: "Study hall isn’t optional, even for stars." },
-      { user: "@TideRoller", comment: "This kid’s already showing he’s overrated." },
-    ],
-  },
-  {
-    headline: "Montrell Johnson Jr. Faces Fine for Parking Violations",
-    content: "Montrell Johnson Jr. received multiple parking tickets for leaving his car in restricted faculty spaces. He apologized and paid the fines but was warned about further infractions.",
-    timestamp: "1:15 PM - November 15, 2024",
-    likes: 22,
-    replies: [
-      { user: "@SwampKing", comment: "Come on, Montrell! Follow the rules, man." },
-      { user: "@CampusGator", comment: "Faculty parking is sacred. LOL." },
-      { user: "@VolsFan", comment: "Can’t find the end zone or a parking spot!" },
-    ],
-  },
-  {
-    headline: "Eugene Wilson III Questioned About Library Altercation",
-    content: "Wide receiver Eugene Wilson III was briefly questioned by campus security after a disagreement over study room usage. No charges were filed, but witnesses say tensions flared.",
-    timestamp: "7:45 PM - November 14, 2024",
-    likes: 11,
-    replies: [
-      { user: "@GatorPride", comment: "This sounds blown out of proportion." },
-      { user: "@LibraryGator", comment: "Let’s keep the library peaceful, Eugene!" },
-      { user: "@GeorgiaFan", comment: "Gators fighting over books now? LOL." },
-    ],
-  },
-  {
-    headline: "Jason Marshall Jr. Sidelined with Hamstring Strain",
-    content: "Star defensive back Jason Marshall Jr. suffered a hamstring strain during practice. Trainers estimate he’ll miss 2-3 weeks while he recovers.",
-    timestamp: "8:00 AM - November 13, 2024",
-    likes: 34,
-    replies: [
-      { user: "@ChompChomp", comment: "Heal up fast, Jason. We need you back!" },
-      { user: "@UFTrainer", comment: "Hamstrings can be tricky. Take your time!" },
-      { user: "@RollTideFan", comment: "Bama’s WRs scared him into this injury!" },
-    ],
-  },
-  {
-    headline: "Treyaun Webb Cited for Skateboarding on Campus Walkways",
-    content: "Running back Treyaun Webb received a citation for skateboarding in a restricted area near Turlington Plaza, narrowly missing several pedestrians.",
-    timestamp: "4:00 PM - November 12, 2024",
-    likes: 15,
-    replies: [
-      { user: "@UFStudent", comment: "Skateboarding is NOT a crime! Let him live." },
-      { user: "@CampusSafety", comment: "Rules are rules, Treyaun. Safety first." },
-      { user: "@FSURival", comment: "Only thing he’ll run into is another ticket!" },
-    ],
-  },
-  {
-    headline: "Arlis Boardingham Misses Practice Due to Academic Ineligibility Scare",
-    content: "Tight end Arlis Boardingham was held out of practice while the university reviewed his academic standing. Officials cleared him to return, but the scare raised concerns.",
-    timestamp: "3:45 PM - November 11, 2024",
-    likes: 21,
-    replies: [
-      { user: "@GatorPride", comment: "Glad he’s back, but stay on top of it, Arlis!" },
-      { user: "@CampusTutor", comment: "Student-athletes are students first." },
-      { user: "@CanesFan", comment: "FSU would never let this slide." },
-    ],
-  },
-  {
-    headline: "Cam Jackson Involved in Minor Dorm Dispute Over Noise Complaints",
-    content: "Defensive lineman Cam Jackson was cited by dorm staff for hosting a loud game night that disturbed other residents. He apologized and promised to keep things quieter.",
-    timestamp: "11:30 PM - November 10, 2024",
-    likes: 18,
-    replies: [
-      { user: "@DormLifeUF", comment: "We’ve all been there, Cam. Just be cool." },
-      { user: "@QuietPlease", comment: "Game night’s fun, but respect your neighbors!" },
-      { user: "@UGAFan", comment: "Gators can’t win on the field or at board games." },
-    ],
-  },
-  {
-    headline: "Kelby Collins Dealing with Food Poisoning Before Game Day",
-    content: "Defensive end Kelby Collins is questionable for Saturday’s game after experiencing food poisoning. He’s being monitored closely by team doctors.",
-    timestamp: "6:30 AM - November 9, 2024",
-    likes: 27,
-    replies: [
-      { user: "@SwampHealth", comment: "Hang in there, Kelby. We need you on Saturday!" },
-      { user: "@UFTrainer", comment: "This is why we avoid sketchy food trucks." },
-      { user: "@VolsForever", comment: "Sounds like y’all are cooking up excuses." },
-    ],
-  },
-  {
-    headline: "Marcus Burke’s Bike Stolen Near Student Union",
-    content: "Wide receiver Marcus Burke reported his bike stolen from outside the student union. Campus police are investigating, but no leads have been found yet.",
-    timestamp: "5:15 PM - November 8, 2024",
-    likes: 13,
-    replies: [
-      { user: "@ChompChomp", comment: "This is terrible. Hope they find it soon!" },
-      { user: "@BikeUF", comment: "Lock your bikes, people. This happens too often." },
-      { user: "@UGAChirps", comment: "Can’t run routes or protect a bike. SMH." },
-    ],
-  },
-  {
-    headline: "Shemar James Misses Weightlifting Session Due to Alarm Mishap",
-    content: "Linebacker Shemar James accidentally missed a mandatory weightlifting session after his alarm failed to go off. He’s been issued a warning by Coach Dupp.",
-    timestamp: "7:45 AM - November 7, 2024",
-    likes: 9,
-    replies: [
-      { user: "@SwampFanatic", comment: "Set two alarms next time, Shemar!" },
-      { user: "@UFStudentLife", comment: "We’ve all been there. Alarms are tricky!" },
-      { user: "@FSURival", comment: "Y’all can’t even wake up on time? LOL." },
-    ],
-  },
-{
-    headline: "Cam Jackson (DL) Undergoes Surgery for Torn Achilles",
-    content: "Senior defensive lineman Cam Jackson suffered a torn Achilles during Monday's practice. Surgery was successful, but Jackson is expected to miss the rest of the season. This injury marks a significant setback for the Gators' defensive line.",
-    timestamp: "8:15 PM - November 16, 2024",
-    likes: 89,
-    replies: [
-      { user: "@GatorFanatic", comment: "Prayers up for Cam! Hope he comes back stronger!" },
-      { user: "@TideRivalry", comment: "Tough loss for Florida, but it’s part of the game." },
-    ],
-  },
-  {
-    headline: "DJ Lagway (QB) Diagnosed with Concussion Symptoms",
-    content: "Freshman quarterback DJ Lagway left Saturday’s game with concussion-like symptoms after a big hit. Lagway is in the concussion protocol and his status for next week remains uncertain.",
-    timestamp: "10:00 PM - November 15, 2024",
-    likes: 73,
-    replies: [
-      { user: "@SwampChomp", comment: "Take all the time you need, DJ. Health comes first!" },
-      { user: "@MiamiTrashTalk", comment: "Looks like Florida is about to collapse without their star QB." },
-    ],
-  },
-  {
-    headline: "Montrell Johnson Jr. (RB) Suspended for Violation of Team Rules",
-    content: "Senior running back Montrell Johnson Jr. has been suspended for two games due to a violation of team conduct policies. Coach Dupp declined to provide further details.",
-    timestamp: "2:45 PM - November 14, 2024",
-    likes: 120,
-    replies: [
-      { user: "@GatorPride", comment: "We trust Coach Dupp to handle this the right way." },
-      { user: "@SECWatcher", comment: "Florida’s running game just took a huge hit." },
-    ],
-  },
-  {
-    headline: "Eugene Wilson III (WR) Sidelined with ACL Tear",
-    content: "Sophomore wide receiver Eugene Wilson III suffered an ACL tear during practice on Wednesday. He will undergo surgery and is expected to be out for 9–12 months.",
-    timestamp: "11:30 AM - November 16, 2024",
-    likes: 67,
-    replies: [
-      { user: "@SwampFaithful", comment: "Devastated for Wilson. Wishing him a smooth recovery!" },
-      { user: "@BamaNation", comment: "That’s a tough break. Hate to see talent sidelined." },
-    ],
-  },
-  {
-    headline: "Justus Boone (EDGE) Arrested for DUI",
-    content: "Junior EDGE rusher Justus Boone was arrested early Sunday morning on suspicion of driving under the influence. Boone has been suspended indefinitely pending investigation.",
-    timestamp: "9:45 AM - November 17, 2024",
-    likes: 52,
-    replies: [
-      { user: "@DieHardGator", comment: "Disappointed in Boone. He needs to make better decisions." },
-      { user: "@TigerFan85", comment: "Florida’s discipline issues are starting to show." },
-    ],
-  },
-  {
-    headline: "Kelby Collins (EDGE) Suffers Broken Arm in Freak Accident",
-    content: "Sophomore EDGE rusher Kelby Collins broke his arm during a weightlifting session. He will be sidelined for at least six weeks, but trainers are optimistic about his recovery.",
-    timestamp: "4:20 PM - November 15, 2024",
-    likes: 38,
-    replies: [
-      { user: "@SwampFamily", comment: "Speedy recovery, Kelby. We need you back!" },
-      { user: "@VolsTroll", comment: "So much for Florida’s defense being a powerhouse." },
-    ],
-  },
-  {
-    headline: "Treyaun Webb (RB) Investigated for Academic Misconduct",
-    content: "Sophomore running back Treyaun Webb is under investigation for alleged academic misconduct. The university is conducting a review, and no further information is available at this time.",
-    timestamp: "6:00 PM - November 16, 2024",
-    likes: 44,
-    replies: [
-      { user: "@GatorNation", comment: "Hoping this is a misunderstanding. Stay focused, Webb!" },
-      { user: "@UGAHater", comment: "Cheaters never prosper. Florida in shambles again." },
-    ],
-  },
-  {
-    headline: "Hayden Hansen (TE) Dislocates Shoulder in Game",
-    content: "Sophomore tight end Hayden Hansen suffered a shoulder dislocation during Saturday’s game. He is expected to miss 4–6 weeks as he rehabs the injury.",
-    timestamp: "8:00 AM - November 14, 2024",
-    likes: 56,
-    replies: [
-      { user: "@GatorFan4Life", comment: "Tough loss, but we have depth at TE. Heal up, Hansen!" },
-      { user: "@SECObserver", comment: "Injuries like these can derail Florida’s momentum." },
-    ],
-  },
-  {
-    headline: "Caden Jones (OL) Injures Knee in Practice",
-    content: "Freshman offensive lineman Caden Jones sprained his knee in practice. Trainers expect him to return in three weeks, barring any setbacks.",
-    timestamp: "1:30 PM - November 13, 2024",
-    likes: 29,
-    replies: [
-      { user: "@SwampLoyalty", comment: "Hoping for a quick recovery. OL injuries are tough!" },
-      { user: "@TennesseeTrash", comment: "Another Gator bites the dust. Not surprised." },
-    ],
-  },
-  {
-    headline: "Grayson Howard (ILB) Diagnosed with Turf Toe",
-    content: "Sophomore linebacker Grayson Howard has been diagnosed with turf toe following last week’s game. He is listed as day-to-day, with hopes of playing against Alabama.",
-    timestamp: "5:50 PM - November 17, 2024",
-    likes: 37,
-    replies: [
-      { user: "@GatorChomp", comment: "Tough it out, Grayson. We need you for Bama!" },
-      { user: "@CrimsonTideFan", comment: "Wouldn’t matter if he plays. Bama rolls anyway." },
-    ],
-  },
-];
-
-// Function to Generate a Random Breaking News Post
-function renderBreakingNews() {
-  const postContainer = document.getElementById("forum-post-container");
-  const repliesContainer = document.getElementById("replies");
-
-  // Pick a random post
-  const randomPost = breakingNewsPosts[Math.floor(Math.random() * breakingNewsPosts.length)];
-
-  // Render the post
-  postContainer.innerHTML = `
-    <p class="author">Posted by Bernard Melon, Gator-Byte News</p>
-    <h3>${randomPost.headline}</h3>
-    <p>${randomPost.content}</p>
-    <p class="timestamp">${randomPost.timestamp}</p>
-    <div class="like-reply-buttons">
-      <button class="like-btn" onclick="likePost()">👍 Like <span id="like-count">${randomPost.likes}</span></button>
-    </div>
-  `;
-
-  // Render replies
-  repliesContainer.innerHTML = randomPost.replies
-    .map(
-      reply => `
-        <div class="reply">
-          <div class="profile-pic" style="background-image: url('https://i.pravatar.cc/50');"></div>
-          <div class="comment">
-            <p><strong>${reply.user}</strong>: ${reply.comment}</p>
-          </div>
+    <div class="container">
+        <div class="header">
+            <h1>CFB 25 Coach Points Tracker</h1>
         </div>
-      `
-    )
-    .join("");
 
-  // Save the post for reply handling
-  currentPost = randomPost;
-}
-
-// Function to Add a Like
-function likePost() {
-  currentPost.likes += 1;
-  document.getElementById("like-count").textContent = currentPost.likes;
-}
-
-// Function to Add a User Reply
-function addUserReply() {
-  const replyInput = document.getElementById("reply-input");
-  const replyText = replyInput.value.trim();
-  if (replyText) {
-    const repliesContainer = document.getElementById("replies");
-    currentPost.replies.push({ user: "@BrickDupp", comment: replyText });
-
-    // Render updated replies
-    repliesContainer.innerHTML += `
-      <div class="reply">
-        <div class="profile-pic" style="background-image: url('https://i.pravatar.cc/50?img=5');"></div>
-        <div class="comment">
-          <p><strong>@BrickDupp</strong>: ${replyText}</p>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h2>Current Level</h2>
+                <p id="currentLevelDisplay">1</p>
+            </div>
+            <div class="stat-card">
+                <h2>Coach Points</h2>
+                <p id="coachPointsDisplay">0</p> </div>
         </div>
-      </div>
-    `;
 
-    // Clear the input field
-    replyInput.value = "";
-  }
-}
+        <div>
+            <h3 id="levelProgressTitle" class="text-lg font-medium mb-1 text-blue-300" style="font-family: 'Oswald', sans-serif; color: #90cdf4;">Level Progress (1 to 50)</h3>
+            <div class="level-progress-container">
+                <div id="levelProgressBar" class="level-progress-bar">Level 1</div>
+            </div>
+        </div>
 
-// Store the current post for handling replies/likes
-let currentPost = null;
+        <div class="controls-section">
+            <h3>Level Management</h3>
+            <div class="button-group">
+                <button id="levelUpBtn" class="btn btn-level">Level Up (+10 Pts)</button>
+                <button id="levelDownBtn" class="btn btn-level-down">Level Down (-10 Pts)</button>
+                <button id="maxLevelBtn" class="btn btn-max-level">Max Out Level (to 50)</button>
+                <button id="resetBtn" class="btn btn-reset">Reset All</button>
+            </div>
+        </div>
 
-// Call the function on page load
-renderBreakingNews();
+        <div class="perks-section">
+            <h3>Generic Perk Purchases</h3>
+            <div class="button-group" id="genericPerkButtonsContainer"></div>
+        </div>
 
+        <div class="perks-section">
+            <h3>Skill Tree - CEO</h3>
+            <div class="button-group" id="ceoMainPerkContainer"></div>
+            <h4>CEO Sub-Skills <span class="perk-cost-display">(18 Pts each)</span></h4>
+            <div class="button-group" id="ceoSubPerksContainer"></div>
+        </div>
 
-</script>
+        <div class="perks-section">
+            <h3>Skill Tree - Program Builder</h3>
+            <div class="button-group" id="programBuilderMainPerkContainer"></div>
+            <h4>Program Builder Sub-Skills <span class="perk-cost-display">(12 Pts each)</span></h4>
+            <div class="button-group" id="programBuilderSubPerksContainer"></div>
+        </div>
 
+        <div class="perks-section">
+            <h3>Skill Tree - Motivator</h3>
+            <div class="button-group" id="motivatorMainPerkContainer"></div>
+            <h4>Motivator Sub-Skills <span class="perk-cost-display">(5 Pts each, per position)</span></h4>
+            <div class="button-group" id="motivatorSubPerksContainer"></div>
+        </div>
 
+        <div class="perks-section">
+            <h3>Skill Tree - Master Motivator</h3>
+            <div class="button-group" id="masterMotivatorMainPerkContainer"></div>
+            <h4>Master Motivator Sub-Skills <span class="perk-cost-display">(8 Pts each, per position)</span></h4>
+            <div class="button-group" id="masterMotivatorSubPerksContainer"></div>
+        </div>
 
+        <div class="perks-section">
+            <h3>Skill Tree - Architect</h3>
+            <h4>Architect Sub-Skills <span class="perk-cost-display">(8 Pts each, per position)</span></h4>
+            <div class="button-group" id="architectSubPerksContainer"></div>
+        </div>
 
+        <div class="perks-section">
+            <h3>Skill Tree - Tactician</h3>
+            <div class="button-group" id="tacticianMainPerkContainer"></div>
+            <h4>Tactician Sub-Skills <span class="perk-cost-display">(5 Pts each)</span></h4>
+            <div class="button-group" id="tacticianSubPerksContainer"></div>
+        </div>
 
-  <footer>
-  <img src="https://i.postimg.cc/tRVjQbYf/florida-gators-logotyp-us.png" alt="Gators Logo" style="height: 50px; margin: 10px auto;">
-  <p>&copy; 2024 Swamp Social. All rights reserved. <strong>Go Gators!</strong></p>
-</footer>
+        <div class="perks-section">
+            <h3>Skill Tree - Tactician Master Class</h3>
+            <div class="button-group" id="schemeGuruMainPerkContainer"> </div>
+            <h4>Scheme Guru Sub-Skills <span class="perk-cost-display">(8 Pts each)</span></h4>
+            <div class="button-group" id="schemeGuruSubPerksContainer"></div>
+        </div>
 
+        <div class="perks-section">
+            <h3>Skill Class - Recruiter</h3>
+            <div class="button-group" id="recruiterMainPerkContainer"></div>
+            <h4>Recruiter Sub-Skills <span class="perk-cost-display">(5 Pts each, per position)</span></h4>
+            <div class="button-group" id="recruiterSubPerksContainer"></div>
+        </div>
 
-  <script>
-    function showTab(tabId) {
-      const tabs = document.querySelectorAll('.tab-content');
-      tabs.forEach(tab => tab.classList.add('hidden'));
-      document.getElementById(tabId).classList.remove('hidden');
-    }
+        <div class="perks-section">
+            <h3>Skill Masterclass - Expert Recruiter</h3>
+            <div class="button-group" id="expertRecruiterMainPerkContainer"></div>
+            <h4>Expert Recruiter Sub-Skills <span class="perk-cost-display">(8 Pts each, per position)</span></h4>
+            <div class="button-group" id="expertRecruiterSubPerksContainer"></div>
+        </div>
 
-    function addForumReply() {
-      const input = document.getElementById('forumReply');
-      const replyText = input.value.trim();
-      if (replyText) {
-        const repliesContainer = document.querySelector('.forum-post .replies');
-        const newReply = document.createElement('div');
-        newReply.className = 'reply';
-        newReply.innerHTML = `
-          <div class="profile-pic" style="background-image: url('https://i.pravatar.cc/50?img=5');"></div>
-          <p><strong>@BrickDupp:</strong> ${replyText}</p>
-        `;
-        repliesContainer.appendChild(newReply);
-        input.value = '';
-      }
-    }
+        <div class="perks-section">
+            <h3>Skill Tree - Strategist</h3>
+            <h4>Strategist Sub-Skills <span class="perk-cost-display">(8 Pts each, per position)</span></h4>
+            <div class="button-group" id="strategistSubPerksContainer"></div>
+        </div>
 
-    showTab('stats');
-  </script>
+        <div class="perks-section">
+            <h3>Skill Tree - Talent Developer</h3>
+            <h4>Talent Developer Sub-Skills <span class="perk-cost-display">(8 Pts each, per position)</span></h4>
+            <div class="button-group" id="talentDeveloperSubPerksContainer"></div>
+        </div>
 
-<img src="https://i.postimg.cc/tRVjQbYf/florida-gators-logotyp-us.png" alt="Floating Gators Logo" style="position: fixed; bottom: 20px; right: 20px; height: 60px; cursor: pointer;" onclick="scrollToTop()">
-<script>
-  function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-</script>
-
-<script>
-  const quizQuestions = [
-    { question: "What year did the Florida Gators win their first NCAA football championship?", options: ["1994", "1996", "1998", "2000"], answer: "1996" },
-    { question: "Who is the all-time leading passer for the Florida Gators?", options: ["Danny Wuerffel", "Tim Tebow", "Chris Leak", "Rex Grossman"], answer: "Chris Leak" },
-    // Add all 100 beginner-level questions here
-{ question: "Who was the Florida Gators head coach during their first national championship in 1996?", options: ["Steve Spurrier", "Urban Meyer", "Ron Zook", "Will Muschamp"], answer: "Steve Spurrier" },
-  { question: "What is the name of the Florida Gators’ home stadium?", options: ["The Swamp", "Ben Hill Griffin Stadium", "Doak Campbell Stadium", "Tiger Stadium"], answer: "Ben Hill Griffin Stadium" },
-  { question: "Which Florida Gators quarterback won the Heisman Trophy in 2007?", options: ["Tim Tebow", "Danny Wuerffel", "Steve Spurrier", "Rex Grossman"], answer: "Tim Tebow" },
-  { question: "What year did the Florida Gators win their second national championship?", options: ["2006", "2008", "1996", "2010"], answer: "2006" },
-  { question: "Who is the Florida Gators’ all-time leading rusher?", options: ["Emmitt Smith", "Fred Taylor", "Errict Rhett", "Tim Tebow"], answer: "Errict Rhett" },
-  { question: "How many national championships have the Florida Gators won in football?", options: ["3", "4", "2", "5"], answer: "3" },
-  { question: "Which Florida Gators player was nicknamed 'The Chosen One' during his career?", options: ["Percy Harvin", "Tim Tebow", "Kyle Pitts", "Chris Leak"], answer: "Tim Tebow" },
-  { question: "What year was Florida's first SEC Championship victory?", options: ["1991", "1993", "1994", "1995"], answer: "1991" },
-  { question: "Which Florida Gators receiver was a first-round pick in the 2021 NFL Draft?", options: ["Kyle Pitts", "Kadarius Toney", "Freddie Swain", "Van Jefferson"], answer: "Kadarius Toney" },
-  { question: "What is the capacity of Ben Hill Griffin Stadium?", options: ["88,548", "90,000", "91,916", "85,000"], answer: "88,548" },
-  { question: "Which Florida Gators linebacker won the Butkus Award in 2006?", options: ["Brandon Spikes", "Channing Crowder", "Jarvis Moss", "Brandon Siler"], answer: "Brandon Spikes" },
-  { question: "Who holds the Florida Gators’ single-season passing touchdowns record?", options: ["Danny Wuerffel", "Tim Tebow", "Rex Grossman", "Kyle Trask"], answer: "Kyle Trask" },
-  { question: "What year did Steve Spurrier win the Heisman Trophy as a Florida Gator?", options: ["1966", "1970", "1964", "1968"], answer: "1966" },
-  { question: "Which Florida Gators player was known for the ‘Jump Pass’?", options: ["Tim Tebow", "Chris Leak", "Rex Grossman", "Danny Wuerffel"], answer: "Tim Tebow" },
-  { question: "Who was the Florida Gators’ quarterback during their 2006 National Championship season?", options: ["Chris Leak", "Tim Tebow", "Cam Newton", "Rex Grossman"], answer: "Chris Leak" },
-  { question: "Who was the head coach for the Florida Gators during their 2008 National Championship season?", options: ["Urban Meyer", "Will Muschamp", "Ron Zook", "Dan Mullen"], answer: "Urban Meyer" },
-  { question: "Which Florida Gators running back was a first-round pick in the 1990 NFL Draft?", options: ["Emmitt Smith", "Fred Taylor", "Errict Rhett", "Ciatrick Fason"], answer: "Emmitt Smith" },
-  { question: "What year did the Florida Gators join the SEC?", options: ["1932", "1933", "1928", "1926"], answer: "1932" },
-  { question: "What are the Florida Gators’ official colors?", options: ["Orange and Blue", "Green and Gold", "Crimson and White", "Purple and Gold"], answer: "Orange and Blue" },
-  { question: "Who is the Florida Gators' career leader in receiving yards?", options: ["Carlos Alvarez", "Ricky Nattiel", "Jabar Gaffney", "Percy Harvin"], answer: "Carlos Alvarez" },
-  { question: "What is the nickname of the Florida Gators’ marching band?", options: ["The Pride of the Sunshine", "The Swamp Marchers", "The Orange Wave", "The Alligator Brigade"], answer: "The Pride of the Sunshine" },
-  { question: "Which Florida Gators coach was nicknamed ‘The Head Ball Coach’?", options: ["Steve Spurrier", "Urban Meyer", "Dan Mullen", "Will Muschamp"], answer: "Steve Spurrier" },
-  { question: "Which Florida Gators player was the No. 1 overall pick in the 1985 NFL Draft?", options: ["Lomas Brown", "Wilber Marshall", "John L. Williams", "Alonzo Highsmith"], answer: "Lomas Brown" },
-  { question: "Who is the Florida Gators’ all-time leader in interceptions?", options: ["Willie Jackson", "Lito Sheppard", "Reggie Nelson", "Joe Brodsky"], answer: "Willie Jackson" },
-  { question: "What year did the Florida Gators football program begin?", options: ["1906", "1910", "1904", "1901"], answer: "1906" },
-  { question: "Which Florida Gators kicker holds the record for the longest field goal?", options: ["Evan McPherson", "Chris Perkins", "Caleb Sturgis", "Judd Davis"], answer: "Evan McPherson" },
-  { question: "Who did the Florida Gators defeat to win their 2008 National Championship?", options: ["Oklahoma", "Ohio State", "Alabama", "USC"], answer: "Oklahoma" },
-  { question: "Who was the Florida Gators’ defensive coordinator during their 2006 National Championship season?", options: ["Charlie Strong", "Dan Quinn", "Randy Shannon", "Greg Mattison"], answer: "Charlie Strong" },
-  { question: "Which Florida Gators player is known for the famous ‘Promise’ speech?", options: ["Tim Tebow", "Urban Meyer", "Chris Leak", "Percy Harvin"], answer: "Tim Tebow" },
-  { question: "Who was the Florida Gators’ leading receiver in the 2020 season?", options: ["Kyle Pitts", "Kadarius Toney", "Tre Grimes", "Van Jefferson"], answer: "Kadarius Toney" },
-  { question: "What SEC East rival do the Florida Gators face annually in Jacksonville?", options: ["Georgia Bulldogs", "Tennessee Volunteers", "South Carolina Gamecocks", "Missouri Tigers"], answer: "Georgia Bulldogs" },
-  { question: "Which former Florida Gators linebacker was inducted into the Pro Football Hall of Fame in 2007?", options: ["Jack Youngblood", "Wilber Marshall", "Derrick Thomas", "Emmitt Smith"], answer: "Jack Youngblood" },
-  { question: "What year did Urban Meyer become the head coach of the Florida Gators?", options: ["2005", "2004", "2006", "2007"], answer: "2005" },
-  { question: "Which Florida Gators quarterback set the SEC single-season touchdown record in 2020?", options: ["Kyle Trask", "Tim Tebow", "Danny Wuerffel", "Rex Grossman"], answer: "Kyle Trask" },
-  { question: "Who was the Florida Gators’ first All-American player?", options: ["Ark Newton", "Jack Meagher", "Charlie Bachman", "Rhett Brown"], answer: "Ark Newton" },
-  { question: "What is the Florida Gators' fight song called?", options: ["Orange and Blue", "Gator Nation", "The Swamp Chant", "Gators Forever"], answer: "Orange and Blue" },
-  { question: "Which Florida Gators player was nicknamed ‘Cadillac’?", options: ["Willie Jackson", "Ricky Nattiel", "Emmitt Smith", "Carlos Alvarez"], answer: "Carlos Alvarez" },
-  { question: "Which former Florida Gator went on to become a WWE champion?", options: ["Ron Simmons", "Emmitt Smith", "Fred Taylor", "Trey Burton"], answer: "Ron Simmons" },
-  { question: "Which team did the Florida Gators defeat to win their first-ever SEC Championship Game?", options: ["Alabama", "Georgia", "Tennessee", "LSU"], answer: "Alabama" },
-];
-
-  let currentQuiz = [];
-  let currentQuestionIndex = 0;
-  let score = 0;
-
-  function startQuiz() {
-    score = 0;
-    currentQuestionIndex = 0;
-    currentQuiz = quizQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
-    showQuestion();
-  }
-
-  function showQuestion() {
-    const questionData = currentQuiz[currentQuestionIndex];
-    const quizContainer = document.getElementById("quiz-container");
-
-    quizContainer.innerHTML = `
-      <div>
-        <h3>Question ${currentQuestionIndex + 1} of 10</h3>
-        <p>${questionData.question}</p>
-        ${questionData.options
-          .map(
-            (option) =>
-              `<button class="quiz-option" onclick="submitAnswer('${option}', this)">${option}</button>`
-          )
-          .join("")}
-      </div>
-    `;
-  }
-
-  function submitAnswer(selected, buttonElement) {
-    const questionData = currentQuiz[currentQuestionIndex];
-
-    if (selected === questionData.answer) {
-      score++;
-      buttonElement.style.backgroundColor = "green"; // Correct answer
-    } else {
-      buttonElement.style.backgroundColor = "red"; // Incorrect answer
-
-      // Highlight the correct answer for reference
-      const correctButton = Array.from(document.querySelectorAll(".quiz-option")).find(
-        (btn) => btn.textContent === questionData.answer
-      );
-      if (correctButton) {
-        correctButton.style.backgroundColor = "green";
-      }
-    }
-
-    // Disable all buttons to prevent further clicks on this question
-    Array.from(document.querySelectorAll(".quiz-option")).forEach((btn) => {
-      btn.disabled = true;
-    });
-
-    // Proceed to the next question after a short delay
-    setTimeout(() => {
-      currentQuestionIndex++;
-      if (currentQuestionIndex < currentQuiz.length) {
-        showQuestion();
-      } else {
-        showResults();
-      }
-    }, 1000); // 1-second delay
-  }
-
-  function showResults() {
-    const quizContainer = document.getElementById("quiz-container");
-    const percentage = ((score / currentQuiz.length) * 100).toFixed(2);
-
-    quizContainer.innerHTML = `
-      <div>
-        <h3>Quiz Complete!</h3>
-        <p>Your Score: ${score} / ${currentQuiz.length}</p>
-        <p>Percentage: ${percentage}%</p>
-        <button onclick="startQuiz()">Retake Quiz</button>
-      </div>
-    `;
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const quizTab = document.querySelector('[href="#quiz"]');
-    quizTab.addEventListener("click", startQuiz);
-  });
-
-</script>
-
-<div id="highlights" class="tab-content hidden">
-  <h2>Game Highlights</h2>
-  <div class="highlights-container">
-    
-    <!-- Week 1 Highlights -->
-    <div class="highlight">
-      <h3>Week 1: Florida vs. Miami - Offensive Highlights</h3>
-      <iframe 
-        src="https://player.vimeo.com/video/1031344419" 
-        width="560" 
-        height="315" 
-        frameborder="0" 
-        allow="autoplay; fullscreen; picture-in-picture" 
-        allowfullscreen>
-      </iframe>
-      <p>Relive the thrilling offensive highlights from the Florida vs. Miami game in Week 1!</p>
+        <div id="messageBox" class="message-box"></div>
     </div>
 
-    <div class="highlight">
-      <h3>Week 1: Florida vs. Miami - Defensive Highlights</h3>
-      <iframe 
-        src="https://player.vimeo.com/video/1031344757" 
-        width="560" 
-        height="315" 
-        frameborder="0" 
-        allow="autoplay; fullscreen; picture-in-picture" 
-        allowfullscreen>
-      </iframe>
-      <p>Check out the defensive dominance of the Gators in their Week 1 matchup against Miami.</p>
-    </div>
+    <script>
+        // --- Configuration ---
+        const STARTING_LEVEL = 1;
+        const MAX_LEVEL = 50;
+        const POINTS_PER_LEVEL = 10;
+        const STARTING_POINTS = 0; // Changed from 10 to 0
+        const GENERIC_PERK_COSTS = [30, 20, 18, 15, 12, 8, 5];
+        const POSITIONS = ["QB", "RB", "WR/TE", "OL", "DL", "LB", "DB", "K/P"];
 
-    <!-- Week 2 Highlights -->
-    <div class="highlight">
-      <h3>Week 2: Florida vs. FCS Southeast</h3>
-      <iframe 
-        src="https://player.vimeo.com/video/1031322438" 
-        width="560" 
-        height="315" 
-        frameborder="0" 
-        allow="autoplay; fullscreen; picture-in-picture" 
-        allowfullscreen>
-      </iframe>
-      <p>A dominant performance by the Gators. Relive the best plays from Week 2!</p>
-    </div>
+        // --- State Variables ---
+        let currentLevel = STARTING_LEVEL;
+        let coachPoints = STARTING_POINTS;
 
-    <!-- PNG Image Gallery -->
-<div class="highlight">
-  <h3>Photo Gallery</h3>
-  <div id="photo-gallery">
-    <img src="https://imgur.com/VccTzZQ.png" alt="Highlight 1" class="gallery-img active">
-  <img src="https://imgur.com/EAG29ix.png" alt="Highlight 2" class="gallery-img">
-  <img src="https://imgur.com/RmgzTSB.png" alt="Highlight 3" class="gallery-img">
-  <img src="https://imgur.com/5Ln9yDl.png" alt="Highlight 4" class="gallery-img">
-  <img src="https://imgur.com/7vBtoPx.png" alt="Highlight 5" class="gallery-img">
-  <img src="https://imgur.com/A6PQt5D.png" alt="Highlight 6" class="gallery-img">
-  <img src="https://imgur.com/mCjbKqw.png" alt="Highlight 7" class="gallery-img">
-  <img src="https://imgur.com/uU6Vqt3.png" alt="Highlight 8" class="gallery-img">
-  <img src="https://imgur.com/scQrMyY.png" alt="Highlight 9" class="gallery-img">
-  </div>
-  <button id="prev-btn" class="gallery-btn">Previous</button>
-  <button id="next-btn" class="gallery-btn">Next</button>
-</div>
+        // Helper function to create leveled perks
+        function createLeveledPerks(baseName, levels, cost, sectionId, colorClass) {
+            let perks = [];
+            for (let i = 1; i <= levels; i++) {
+                perks.push({
+                    id: `${baseName.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '')}_l${i}`,
+                    name: `${baseName} L${i}`,
+                    cost: cost,
+                    purchased: false,
+                    sectionId: sectionId,
+                    colorClass: colorClass
+                });
+            }
+            return perks;
+        }
 
+        // Helper function to create positional perks
+        function createPositionalPerks(baseName, cost, sectionId, positionsArray, colorClass) {
+            return positionsArray.flatMap(pos => ({
+                id: `${baseName.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '').replace(/'/g, '')}_${pos.toLowerCase().replace('/', '')}`,
+                name: `${baseName} (${pos})`,
+                cost: cost,
+                purchased: false,
+                sectionId: sectionId,
+                colorClass: colorClass
+            }));
+        }
 
+        let specificPerks = [
+             // CEO Tree - Gold
+            { id: 'ceo_tree', name: 'Skill Tree - CEO', cost: 30, purchased: false, sectionId: 'ceoMainPerkContainer', colorClass: 'btn-perk-ceo' },
+            { id: 'delay_sunday', name: 'Delay Sunday', cost: 18, purchased: false, sectionId: 'ceoSubPerksContainer', colorClass: 'btn-perk-ceo' },
+            { id: 'second_chance', name: 'Second Chance Keeper', cost: 18, purchased: false, sectionId: 'ceoSubPerksContainer', colorClass: 'btn-perk-ceo' },
+            { id: 'home_away', name: 'Home Away from Home', cost: 18, purchased: false, sectionId: 'ceoSubPerksContainer', colorClass: 'btn-perk-ceo' },
+            { id: 'portal_preview', name: 'Portal Preview', cost: 18, purchased: false, sectionId: 'ceoSubPerksContainer', colorClass: 'btn-perk-ceo' },
+            { id: 'gasoline', name: 'Gasoline', cost: 18, purchased: false, sectionId: 'ceoSubPerksContainer', colorClass: 'btn-perk-ceo' },
+            { id: 'hot_seat', name: 'Hot Seat Chiller', cost: 18, purchased: false, sectionId: 'ceoSubPerksContainer', colorClass: 'btn-perk-ceo' },
+            { id: 'dream_school', name: 'Dream School', cost: 18, purchased: false, sectionId: 'ceoSubPerksContainer', colorClass: 'btn-perk-ceo' },
+            { id: 'bundle_discount_ceo', name: 'Bundle Discount', cost: 18, purchased: false, sectionId: 'ceoSubPerksContainer', colorClass: 'btn-perk-ceo' },
 
+            // Program Builder Tree - Silver
+            { id: 'program_builder_tree', name: 'Skill Tree - Program Builder', cost: 20, purchased: false, sectionId: 'programBuilderMainPerkContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'booster_packed', name: 'Booster Packed', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'tack_one_on', name: 'Tack One On', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'lower_the_bar', name: 'Lower the Bar', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'home_field_advantage', name: 'Home Field Advantage', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'road_warriors', name: 'Road Warriors', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'not_intimidated', name: 'Not Intimidated', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'best_advice', name: 'Best Advice', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'family_atmosphere', name: 'Family Atmosphere', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'lets_run_it_back', name: 'Lets Run It Back', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'gift_of_gab', name: 'Gift of Gab', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'roster_retainer', name: 'Roster Retainer', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'full_refund', name: 'Full Refund', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'giving_back', name: 'Giving Back', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'household_name', name: 'Household Name', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'hometown_discount', name: 'Hometown Discount', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'invest', name: 'Invest', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'making_inroads', name: 'Making Inroads', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'share_the_wealth', name: 'Share the Wealth', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'smart_goals', name: 'Smart Goals', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'signing_bonus', name: 'Signing Bonus', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
+            { id: 'friends_family_discount', name: 'Friends & Family Discount', cost: 12, purchased: false, sectionId: 'programBuilderSubPerksContainer', colorClass: 'btn-perk-program-builder' },
 
-<script>
-  // Image Gallery Functionality
-  document.addEventListener("DOMContentLoaded", function () {
-    const images = document.querySelectorAll("#photo-gallery .gallery-img");
-    const prevBtn = document.getElementById("prev-btn");
-    const nextBtn = document.getElementById("next-btn");
-    let currentIndex = 0;
+            // Motivator Tree - Yellow
+            { id: 'motivator_tree', name: 'Skill Tree - Motivator', cost: 10, purchased: false, sectionId: 'motivatorMainPerkContainer', colorClass: 'btn-perk-motivator' },
+            ...createPositionalPerks("Pay it forward", 5, 'motivatorSubPerksContainer', POSITIONS, 'btn-perk-motivator'),
+            ...createPositionalPerks("Hot hand", 5, 'motivatorSubPerksContainer', POSITIONS, 'btn-perk-motivator'),
+            ...createPositionalPerks("Put in work", 5, 'motivatorSubPerksContainer', POSITIONS, 'btn-perk-motivator'),
+            ...createPositionalPerks("Locked in", 5, 'motivatorSubPerksContainer', POSITIONS, 'btn-perk-motivator'),
 
-    function showImage(index) {
-      images.forEach((img, i) => {
-        img.classList.remove("active");
-        if (i === index) img.classList.add("active");
-      });
-    }
+            // Master Motivator Tree - Yellow
+            { id: 'master_motivator_tree', name: 'Skill Tree - Master Motivator', cost: 15, purchased: false, sectionId: 'masterMotivatorMainPerkContainer', colorClass: 'btn-perk-motivator' },
+            ...createPositionalPerks("Quick recovery", 8, 'masterMotivatorSubPerksContainer', POSITIONS, 'btn-perk-motivator'),
+            ...createPositionalPerks("Extra gear", 8, 'masterMotivatorSubPerksContainer', POSITIONS, 'btn-perk-motivator'),
+            ...createPositionalPerks("Everybody eats", 8, 'masterMotivatorSubPerksContainer', POSITIONS, 'btn-perk-motivator'),
+            ...createPositionalPerks("Icy veins", 8, 'masterMotivatorSubPerksContainer', POSITIONS, 'btn-perk-motivator'),
 
-    prevBtn.addEventListener("click", () => {
-      currentIndex = (currentIndex - 1 + images.length) % images.length;
-      showImage(currentIndex);
-    });
+            // Architect Tree - Purple
+            ...createPositionalPerks("Field Study", 8, 'architectSubPerksContainer', POSITIONS, 'btn-perk-architect'),
+            ...createPositionalPerks("Limitless", 8, 'architectSubPerksContainer', POSITIONS, 'btn-perk-architect'),
+            ...createPositionalPerks("Cant stop, wont stop", 8, 'architectSubPerksContainer', POSITIONS, 'btn-perk-architect'),
+            ...createPositionalPerks("Put a ring on it", 8, 'architectSubPerksContainer', POSITIONS, 'btn-perk-architect'),
 
-    nextBtn.addEventListener("click", () => {
-      currentIndex = (currentIndex + 1) % images.length;
-      showImage(currentIndex);
-    });
+            // Tactician Tree - Blue
+            { id: 'tactician_tree', name: 'Tactician', cost: 10, purchased: false, sectionId: 'tacticianMainPerkContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'mobile_qb_assist', name: 'Mobile QB Assist', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'passing_qb_ratings_boost', name: 'Passing QB Ratings Boost', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'mobile_qb_ratings_boost_2', name: 'Mobile QB Ratings Boost 2', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'passing_qb_ratings_boost_2', name: 'Passing QB Ratings Boost 2', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            ...createLeveledPerks("RB Ratings Boost", 4, 5, 'tacticianSubPerksContainer', 'btn-perk-tactician'),
+            ...createLeveledPerks("WR/TE Ratings Boost", 4, 5, 'tacticianSubPerksContainer', 'btn-perk-tactician'),
+            { id: 'pass_blocking_ol_ratings_boost', name: 'Pass Blocking OL Ratings Boost', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'run_blocking_ol_ratings_boost', name: 'Run Blocking OL Ratings Boost', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'finesse_ol_ratings_boost', name: 'Finesse OL Ratings Boost', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'power_ol_ratings_boost', name: 'Power OL Ratings Boost', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'cross_train_ol_dl', name: 'Cross Train OL as DL', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'cross_train_dl_ol', name: 'Cross Train DL as OL', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'cross_train_wr_db', name: 'Cross Train WR as DB', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'cross_train_db_wr', name: 'Cross Train DB as WR', cost: 5, purchased: false, sectionId: 'tacticianSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            ...createLeveledPerks("DB Ratings Boost", 4, 5, 'tacticianSubPerksContainer', 'btn-perk-tactician'),
+            ...createLeveledPerks("LB Ratings Boost", 4, 5, 'tacticianSubPerksContainer', 'btn-perk-tactician'),
+            ...createLeveledPerks("DL Ratings Boost", 4, 5, 'tacticianSubPerksContainer', 'btn-perk-tactician'),
 
-    // Initialize the first image
-    showImage(currentIndex);
-  });
-</script>
+            // Tactician Master Class - Scheme Guru Tree - Blue
+            { id: 'scheme_guru_tree', name: 'Scheme Guru', cost: 15, purchased: false, sectionId: 'schemeGuruMainPerkContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'battery_pack', name: 'Battery Pack', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'caught_napping', name: 'Caught Napping', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'on_their_heels', name: 'On Their Heels', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'tipped_your_hand', name: 'Tipped Your Hand', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'take_whats_there', name: 'Take Whats There', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'chew_up_yards', name: 'Chew Up Yards', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'stretch_the_field', name: 'Stretch the Field', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'we_see_you', name: 'We See You', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'wear_em_down', name: 'Wear em Down', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'demoralizing', name: 'Demoralizing', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'keep_blocks_longer', name: 'Keep Blocks Longer', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'to_the_whistle', name: 'To The Whistle', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'hater_blockers', name: 'Hater Blockers', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'teflon', name: 'Teflon', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'polished', name: 'Polished', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'clean_sheet_offense', name: 'Clean Sheet Offense', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'unfriendly_confines', name: 'Unfriendly Confines', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'too_loud', name: 'Too Loud', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'no_free_yards', name: 'No Free Yards', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'clean_sheet_defense', name: 'Clean Sheet Defense', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'keep_em_coming', name: 'Keep em Coming', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'fresh_legs', name: 'Fresh Legs', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'hands_off', name: 'Hands Off', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'he_shed', name: 'He Shed', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'punchers_chance', name: 'Punchers Chance', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'no_mid_here', name: 'No Mid Here', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'nothing_deep', name: 'Nothing Deep', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'master_of_disguise', name: 'Master of Disguise', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'gas_tank', name: 'Gas Tank', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'not_so_fast', name: 'Not So Fast', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'cardio_kings', name: 'Cardio Kings', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
+            { id: 'camoflogued_coverage', name: 'Camoflogued Coverage', cost: 8, purchased: false, sectionId: 'schemeGuruSubPerksContainer', colorClass: 'btn-perk-tactician' },
 
+            // Recruiter Skill Class - Red
+            { id: 'recruiter_skill_class', name: 'Skill Class - Recruiter', cost: 10, purchased: false, sectionId: 'recruiterMainPerkContainer', colorClass: 'btn-perk-recruiter' },
+            ...createPositionalPerks("Advanced Look", 5, 'recruiterSubPerksContainer', POSITIONS, 'btn-perk-recruiter'),
+            ...createPositionalPerks("Most Influential", 5, 'recruiterSubPerksContainer', POSITIONS, 'btn-perk-recruiter'),
+            ...createPositionalPerks("Always be Crootin'", 5, 'recruiterSubPerksContainer', POSITIONS, 'btn-perk-recruiter'),
+            ...createPositionalPerks("Magnetic Personality", 5, 'recruiterSubPerksContainer', POSITIONS, 'btn-perk-recruiter'),
+
+            // Expert Recruiter Skill Masterclass - Red
+            { id: 'expert_recruiter_masterclass', name: 'Skill Masterclass - Expert Recruiter', cost: 15, purchased: false, sectionId: 'expertRecruiterMainPerkContainer', colorClass: 'btn-perk-recruiter' },
+            ...createPositionalPerks("Lasting Impression", 8, 'expertRecruiterSubPerksContainer', POSITIONS, 'btn-perk-recruiter'),
+            ...createPositionalPerks("Upsell", 8, 'expertRecruiterSubPerksContainer', POSITIONS, 'btn-perk-recruiter'),
+            ...createPositionalPerks("Home Sweet Home", 8, 'expertRecruiterSubPerksContainer', POSITIONS, 'btn-perk-recruiter'),
+            ...createPositionalPerks("Ideal Situation", 8, 'expertRecruiterSubPerksContainer', POSITIONS, 'btn-perk-recruiter'),
+
+            // Strategist Skill Tree - Orange
+            ...createPositionalPerks("Making friends", 8, 'strategistSubPerksContainer', POSITIONS, 'btn-perk-strategist'),
+            ...createPositionalPerks("Hospitality", 8, 'strategistSubPerksContainer', POSITIONS, 'btn-perk-strategist'),
+            ...createPositionalPerks("Last dance", 8, 'strategistSubPerksContainer', POSITIONS, 'btn-perk-strategist'),
+            ...createPositionalPerks("Mind reader", 8, 'strategistSubPerksContainer', POSITIONS, 'btn-perk-strategist'),
+
+            // Talent Developer Skill Tree - Dark Green
+            ...createPositionalPerks("Portal King", 8, 'talentDeveloperSubPerksContainer', POSITIONS, 'btn-perk-talent-developer'),
+            ...createPositionalPerks("Reach your potential", 8, 'talentDeveloperSubPerksContainer', POSITIONS, 'btn-perk-talent-developer'),
+            ...createPositionalPerks("QB whisperer", 8, 'talentDeveloperSubPerksContainer', POSITIONS, 'btn-perk-talent-developer'),
+            ...createPositionalPerks("Star Maker", 8, 'talentDeveloperSubPerksContainer', POSITIONS, 'btn-perk-talent-developer')
+        ];
+
+        // --- DOM Elements ---
+        const currentLevelDisplay = document.getElementById('currentLevelDisplay');
+        const coachPointsDisplay = document.getElementById('coachPointsDisplay');
+        const levelProgressBar = document.getElementById('levelProgressBar');
+        const levelProgressTitle = document.getElementById('levelProgressTitle');
+        const levelUpBtn = document.getElementById('levelUpBtn');
+        const levelDownBtn = document.getElementById('levelDownBtn');
+        const maxLevelBtn = document.getElementById('maxLevelBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const genericPerkButtonsContainer = document.getElementById('genericPerkButtonsContainer');
+        const messageBox = document.getElementById('messageBox');
+
+        // --- Functions ---
+        function updateDisplay() {
+            currentLevelDisplay.textContent = currentLevel;
+            coachPointsDisplay.textContent = coachPoints;
+
+            let progressPercentage = 0;
+            if (MAX_LEVEL > STARTING_LEVEL) {
+                 progressPercentage = ((currentLevel - STARTING_LEVEL) / (MAX_LEVEL - STARTING_LEVEL)) * 100;
+            } else if (currentLevel >= MAX_LEVEL) {
+                progressPercentage = 100;
+            }
+
+            levelProgressBar.style.width = `${Math.max(0, Math.min(100, progressPercentage))}%`;
+            levelProgressBar.textContent = `Level ${currentLevel}`;
+
+            levelUpBtn.disabled = currentLevel >= MAX_LEVEL;
+            levelDownBtn.disabled = currentLevel <= STARTING_LEVEL;
+            maxLevelBtn.disabled = currentLevel >= MAX_LEVEL;
+
+            document.querySelectorAll('#genericPerkButtonsContainer .btn-perk').forEach(button => {
+                const cost = parseInt(button.dataset.cost);
+                button.disabled = coachPoints < cost;
+            });
+
+            specificPerks.forEach(perk => {
+                const button = document.querySelector(`.btn[data-perk-id='${perk.id}']`);
+                if (button) {
+                    const canAfford = coachPoints >= perk.cost;
+                    // Button is disabled if it's NOT purchased AND cannot be afforded.
+                    button.disabled = !perk.purchased && !canAfford;
+
+                    if (perk.purchased) {
+                        button.classList.add('purchased');
+                        button.textContent = `${perk.name} (Purchased)`;
+                    } else {
+                        button.classList.remove('purchased');
+                        button.textContent = `${perk.name} (${perk.cost} Pts)`;
+                    }
+                }
+            });
+        }
+
+        function showMessage(message, type = 'success') {
+            messageBox.textContent = message;
+            messageBox.className = `message-box ${type === 'error' ? 'message-box-error' : 'message-box-success'}`;
+            messageBox.style.display = 'block';
+            setTimeout(() => { messageBox.style.display = 'none'; }, 3000);
+        }
+
+        function handleLevelUp() {
+            if (currentLevel < MAX_LEVEL) {
+                currentLevel++;
+                coachPoints += POINTS_PER_LEVEL;
+                updateDisplay();
+                showMessage(`Leveled up to ${currentLevel}! Gained ${POINTS_PER_LEVEL} points.`);
+            } else {
+                showMessage('Already at max level!', 'error');
+            }
+        }
+
+        function handleLevelDown() {
+            if (currentLevel > STARTING_LEVEL) {
+                currentLevel--;
+                coachPoints -= POINTS_PER_LEVEL;
+                if (coachPoints < 0) coachPoints = 0; // Ensure points don't go negative
+                updateDisplay();
+                showMessage(`Leveled down to ${currentLevel}. Lost ${POINTS_PER_LEVEL} points.`);
+            } else {
+                showMessage(`Already at starting level (Level ${STARTING_LEVEL})!`, 'error');
+            }
+        }
+
+        function handleGenericPerkPurchase(cost) {
+            if (coachPoints >= cost) {
+                coachPoints -= cost;
+                updateDisplay();
+                showMessage(`Generic perk purchased for ${cost} points.`);
+            } else {
+                showMessage('Not enough coach points for this generic perk!', 'error');
+            }
+        }
+
+        function handleSpecificPerkPurchase(perkId) {
+            const perk = specificPerks.find(p => p.id === perkId);
+            if (!perk) {
+                showMessage('Error: Perk not found! ID: ' + perkId, 'error');
+                console.error("Perk not found with ID:", perkId);
+                return;
+            }
+
+            if (perk.purchased) {
+                // Unselect (refund)
+                coachPoints += perk.cost;
+                perk.purchased = false;
+                updateDisplay();
+                showMessage(`${perk.name} unselected. ${perk.cost} points refunded.`, 'success');
+            } else {
+                // Purchase
+                if (coachPoints >= perk.cost) {
+                    coachPoints -= perk.cost;
+                    perk.purchased = true;
+                    updateDisplay();
+                    showMessage(`${perk.name} purchased for ${perk.cost} points.`, 'success');
+                } else {
+                    showMessage(`Not enough coach points for ${perk.name}! (Need ${perk.cost})`, 'error');
+                }
+            }
+        }
+
+        function handleMaxOutLevel() {
+            if (currentLevel < MAX_LEVEL) {
+                const levelsToGain = MAX_LEVEL - currentLevel;
+                const pointsGained = levelsToGain * POINTS_PER_LEVEL;
+                coachPoints += pointsGained;
+                currentLevel = MAX_LEVEL;
+                updateDisplay();
+                showMessage(`Maxed out to Level ${MAX_LEVEL}! Gained ${pointsGained} points.`);
+            } else {
+                showMessage('Already at max level!', 'error');
+            }
+        }
+
+        function handleReset() {
+            currentLevel = STARTING_LEVEL;
+            coachPoints = STARTING_POINTS; // This will now reset to 0
+            specificPerks.forEach(perk => {
+                perk.purchased = false;
+            });
+            updateDisplay();
+            showMessage('Tracker has been reset to starting values.');
+        }
+
+        function createGenericPerkButtons() {
+            genericPerkButtonsContainer.innerHTML = '';
+            GENERIC_PERK_COSTS.sort((a, b) => a - b).forEach(cost => {
+                const button = document.createElement('button');
+                button.classList.add('btn', 'btn-perk');
+                button.textContent = `Buy Perk (${cost} Pts)`;
+                button.dataset.cost = cost;
+                button.addEventListener('click', () => handleGenericPerkPurchase(cost));
+                genericPerkButtonsContainer.appendChild(button);
+            });
+        }
+
+        function createSpecificPerkButtons() {
+            const perkContainerIds = ['ceoMainPerkContainer', 'ceoSubPerksContainer',
+                                    'programBuilderMainPerkContainer', 'programBuilderSubPerksContainer',
+                                    'motivatorMainPerkContainer', 'motivatorSubPerksContainer',
+                                    'masterMotivatorMainPerkContainer', 'masterMotivatorSubPerksContainer',
+                                    'architectSubPerksContainer',
+                                    'tacticianMainPerkContainer',
+                                    'tacticianSubPerksContainer',
+                                    'schemeGuruMainPerkContainer',
+                                    'schemeGuruSubPerksContainer',
+                                    'recruiterMainPerkContainer',
+                                    'recruiterSubPerksContainer',
+                                    'expertRecruiterMainPerkContainer',
+                                    'expertRecruiterSubPerksContainer',
+                                    'strategistSubPerksContainer',
+                                    'talentDeveloperSubPerksContainer'
+                                    ];
+            perkContainerIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
+
+            specificPerks.forEach(perk => {
+                const container = document.getElementById(perk.sectionId);
+                if (!container) {
+                    console.warn(`Container with id ${perk.sectionId} not found for perk ${perk.name}`);
+                    return;
+                }
+                const button = document.createElement('button');
+                button.classList.add('btn');
+                if (perk.colorClass) {
+                    button.classList.add(perk.colorClass);
+                } else {
+                    button.classList.add('btn-perk');
+                }
+                button.textContent = `${perk.name} (${perk.cost} Pts)`;
+                button.dataset.perkId = perk.id;
+                button.addEventListener('click', () => handleSpecificPerkPurchase(perk.id));
+                container.appendChild(button);
+            });
+        }
+
+        // --- Event Listeners ---
+        levelUpBtn.addEventListener('click', handleLevelUp);
+        levelDownBtn.addEventListener('click', handleLevelDown);
+        maxLevelBtn.addEventListener('click', handleMaxOutLevel);
+        resetBtn.addEventListener('click', handleReset);
+
+        // --- Initialization ---
+        function initializeApp() {
+            // Set initial display based on STARTING_POINTS
+            currentLevelDisplay.textContent = STARTING_LEVEL;
+            coachPointsDisplay.textContent = STARTING_POINTS; // Will be 0
+            levelProgressBar.textContent = `Level ${STARTING_LEVEL}`;
+
+            createGenericPerkButtons();
+            createSpecificPerkButtons();
+            updateDisplay(); // Call updateDisplay to correctly set button states based on 0 points
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
 </body>
 </html>
+
